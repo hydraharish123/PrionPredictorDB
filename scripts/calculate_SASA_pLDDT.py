@@ -3,7 +3,12 @@ import freesasa
 import os
 import pandas as pd
 
+<<<<<<< HEAD
 SASA_pLDDT = {}
+=======
+## Define the object here
+SASA_pLDDT = {} 
+>>>>>>> 47499ee965628dd8ec0113108d498bb42693a049
 
 def get_pLLDT_SASA(uniprot_id, start, end):
     SASA_pLDDT[uniprot_id] = {}
