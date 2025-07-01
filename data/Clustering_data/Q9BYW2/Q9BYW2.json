@@ -1,0 +1,110 @@
+{
+    "cluster_0": [
+        {
+            "chain": "A",
+            "residue": 2270
+        },
+        {
+            "chain": "A",
+            "residue": 2271
+        },
+        {
+            "chain": "A",
+            "residue": 2272
+        },
+        {
+            "chain": "A",
+            "residue": 2273
+        }
+    ],
+    "cluster_1": [
+        {
+            "chain": "A",
+            "residue": 2280
+        },
+        {
+            "chain": "A",
+            "residue": 2281
+        },
+        {
+            "chain": "A",
+            "residue": 2282
+        }
+    ],
+    "cluster_2": [
+        {
+            "chain": "A",
+            "residue": 2294
+        },
+        {
+            "chain": "A",
+            "residue": 2295
+        },
+        {
+            "chain": "A",
+            "residue": 2296
+        },
+        {
+            "chain": "A",
+            "residue": 2297
+        }
+    ],
+    "cluster_3": [
+        {
+            "chain": "A",
+            "residue": 2304
+        },
+        {
+            "chain": "A",
+            "residue": 2305
+        },
+        {
+            "chain": "A",
+            "residue": 2306
+        },
+        {
+            "chain": "A",
+            "residue": 2308
+        },
+        {
+            "chain": "A",
+            "residue": 2309
+        }
+    ],
+    "cluster_4": [
+        {
+            "chain": "A",
+            "residue": 2317
+        },
+        {
+            "chain": "A",
+            "residue": 2318
+        },
+        {
+            "chain": "A",
+            "residue": 2319
+        },
+        {
+            "chain": "A",
+            "residue": 2320
+        }
+    ],
+    "cluster_5": [
+        {
+            "chain": "A",
+            "residue": 2328
+        },
+        {
+            "chain": "A",
+            "residue": 2329
+        },
+        {
+            "chain": "A",
+            "residue": 2330
+        },
+        {
+            "chain": "A",
+            "residue": 2331
+        }
+    ]
+}

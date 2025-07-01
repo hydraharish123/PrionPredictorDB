@@ -1,0 +1,32 @@
+{
+    "cluster_0": [
+        {
+            "chain": "A",
+            "residue": 298
+        },
+        {
+            "chain": "A",
+            "residue": 299
+        }
+    ],
+    "cluster_1": [
+        {
+            "chain": "A",
+            "residue": 331
+        },
+        {
+            "chain": "A",
+            "residue": 332
+        }
+    ],
+    "cluster_2": [
+        {
+            "chain": "A",
+            "residue": 345
+        },
+        {
+            "chain": "A",
+            "residue": 346
+        }
+    ]
+}

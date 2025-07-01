@@ -1,0 +1,76 @@
+{
+    "cluster_0": [
+        {
+            "chain": "A",
+            "residue": 84
+        },
+        {
+            "chain": "A",
+            "residue": 87
+        }
+    ],
+    "cluster_1": [
+        {
+            "chain": "A",
+            "residue": 100
+        },
+        {
+            "chain": "A",
+            "residue": 101
+        },
+        {
+            "chain": "A",
+            "residue": 102
+        }
+    ],
+    "cluster_2": [
+        {
+            "chain": "A",
+            "residue": 110
+        },
+        {
+            "chain": "A",
+            "residue": 112
+        },
+        {
+            "chain": "A",
+            "residue": 113
+        },
+        {
+            "chain": "A",
+            "residue": 114
+        },
+        {
+            "chain": "A",
+            "residue": 115
+        },
+        {
+            "chain": "A",
+            "residue": 116
+        },
+        {
+            "chain": "A",
+            "residue": 117
+        },
+        {
+            "chain": "A",
+            "residue": 118
+        },
+        {
+            "chain": "A",
+            "residue": 119
+        },
+        {
+            "chain": "A",
+            "residue": 120
+        },
+        {
+            "chain": "A",
+            "residue": 121
+        },
+        {
+            "chain": "A",
+            "residue": 122
+        }
+    ]
+}

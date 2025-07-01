@@ -1,0 +1,112 @@
+{
+    "cluster_0": [
+        {
+            "chain": "A",
+            "residue": 422
+        },
+        {
+            "chain": "A",
+            "residue": 423
+        },
+        {
+            "chain": "A",
+            "residue": 424
+        },
+        {
+            "chain": "A",
+            "residue": 425
+        }
+    ],
+    "cluster_1": [
+        {
+            "chain": "A",
+            "residue": 434
+        },
+        {
+            "chain": "A",
+            "residue": 435
+        },
+        {
+            "chain": "A",
+            "residue": 437
+        }
+    ],
+    "cluster_2": [
+        {
+            "chain": "A",
+            "residue": 444
+        },
+        {
+            "chain": "A",
+            "residue": 445
+        },
+        {
+            "chain": "A",
+            "residue": 446
+        },
+        {
+            "chain": "A",
+            "residue": 447
+        },
+        {
+            "chain": "A",
+            "residue": 448
+        }
+    ],
+    "cluster_3": [
+        {
+            "chain": "A",
+            "residue": 458
+        },
+        {
+            "chain": "A",
+            "residue": 460
+        }
+    ],
+    "cluster_4": [
+        {
+            "chain": "A",
+            "residue": 472
+        },
+        {
+            "chain": "A",
+            "residue": 473
+        },
+        {
+            "chain": "A",
+            "residue": 474
+        }
+    ],
+    "cluster_5": [
+        {
+            "chain": "A",
+            "residue": 498
+        },
+        {
+            "chain": "A",
+            "residue": 499
+        },
+        {
+            "chain": "A",
+            "residue": 500
+        },
+        {
+            "chain": "A",
+            "residue": 501
+        },
+        {
+            "chain": "A",
+            "residue": 503
+        }
+    ],
+    "cluster_6": [
+        {
+            "chain": "A",
+            "residue": 509
+        },
+        {
+            "chain": "A",
+            "residue": 510
+        }
+    ]
+}

@@ -1,0 +1,110 @@
+{
+    "cluster_0": [
+        {
+            "chain": "A",
+            "residue": 1899
+        },
+        {
+            "chain": "A",
+            "residue": 1901
+        },
+        {
+            "chain": "A",
+            "residue": 1902
+        },
+        {
+            "chain": "A",
+            "residue": 1903
+        },
+        {
+            "chain": "A",
+            "residue": 1904
+        }
+    ],
+    "cluster_1": [
+        {
+            "chain": "A",
+            "residue": 1909
+        },
+        {
+            "chain": "A",
+            "residue": 1911
+        }
+    ],
+    "cluster_2": [
+        {
+            "chain": "A",
+            "residue": 1931
+        },
+        {
+            "chain": "A",
+            "residue": 1932
+        }
+    ],
+    "cluster_3": [
+        {
+            "chain": "A",
+            "residue": 1942
+        },
+        {
+            "chain": "A",
+            "residue": 1943
+        }
+    ],
+    "cluster_4": [
+        {
+            "chain": "A",
+            "residue": 1949
+        },
+        {
+            "chain": "A",
+            "residue": 1950
+        },
+        {
+            "chain": "A",
+            "residue": 1951
+        }
+    ],
+    "cluster_5": [
+        {
+            "chain": "A",
+            "residue": 1955
+        },
+        {
+            "chain": "A",
+            "residue": 1957
+        },
+        {
+            "chain": "A",
+            "residue": 1958
+        }
+    ],
+    "cluster_6": [
+        {
+            "chain": "A",
+            "residue": 1976
+        },
+        {
+            "chain": "A",
+            "residue": 1977
+        },
+        {
+            "chain": "A",
+            "residue": 1978
+        },
+        {
+            "chain": "A",
+            "residue": 1979
+        }
+    ],
+    "cluster_7": [
+        {
+            "chain": "A",
+            "residue": 1986
+        },
+        {
+            "chain": "A",
+            "residue": 1987
+        }
+    ]
+}

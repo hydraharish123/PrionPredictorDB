@@ -1,0 +1,110 @@
+{
+    "cluster_0": [
+        {
+            "chain": "A",
+            "residue": 803
+        },
+        {
+            "chain": "A",
+            "residue": 804
+        },
+        {
+            "chain": "A",
+            "residue": 805
+        },
+        {
+            "chain": "A",
+            "residue": 806
+        },
+        {
+            "chain": "A",
+            "residue": 809
+        },
+        {
+            "chain": "A",
+            "residue": 812
+        },
+        {
+            "chain": "A",
+            "residue": 813
+        },
+        {
+            "chain": "A",
+            "residue": 815
+        },
+        {
+            "chain": "A",
+            "residue": 817
+        },
+        {
+            "chain": "A",
+            "residue": 818
+        },
+        {
+            "chain": "A",
+            "residue": 819
+        },
+        {
+            "chain": "A",
+            "residue": 821
+        },
+        {
+            "chain": "A",
+            "residue": 826
+        }
+    ],
+    "cluster_1": [
+        {
+            "chain": "A",
+            "residue": 831
+        },
+        {
+            "chain": "A",
+            "residue": 832
+        },
+        {
+            "chain": "A",
+            "residue": 833
+        },
+        {
+            "chain": "A",
+            "residue": 834
+        },
+        {
+            "chain": "A",
+            "residue": 835
+        },
+        {
+            "chain": "A",
+            "residue": 836
+        },
+        {
+            "chain": "A",
+            "residue": 837
+        }
+    ],
+    "cluster_2": [
+        {
+            "chain": "A",
+            "residue": 854
+        },
+        {
+            "chain": "A",
+            "residue": 855
+        },
+        {
+            "chain": "A",
+            "residue": 856
+        }
+    ],
+    "cluster_3": [
+        {
+            "chain": "A",
+            "residue": 864
+        },
+        {
+            "chain": "A",
+            "residue": 865
+        }
+    ]
+}
