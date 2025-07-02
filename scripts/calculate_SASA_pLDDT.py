@@ -2,13 +2,9 @@ from Bio.PDB import PDBParser
 import freesasa
 import os
 import pandas as pd
+import json
 
-<<<<<<< HEAD
 SASA_pLDDT = {}
-=======
-## Define the object here
-SASA_pLDDT = {} 
->>>>>>> 47499ee965628dd8ec0113108d498bb42693a049
 
 def get_pLLDT_SASA(uniprot_id, start, end):
     SASA_pLDDT[uniprot_id] = {}
@@ -63,3 +59,5 @@ for uid in file_names:
     else:
         print(f"{uid} not found in dataframe")
     
+with open('./../data/SASA_pLDDT.json', "w") as f:
+    json.dump(SASA_pLDDT, f)
