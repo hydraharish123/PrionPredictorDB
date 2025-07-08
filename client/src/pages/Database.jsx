@@ -1,60 +1,50 @@
-import { ChartNoAxesCombined } from 'lucide-react'
-import { useState, useMemo } from 'react'
-import { protein_data } from '../data/test_protein_data'
-import PPDB from '../data/PPDB.json'
-
-const rawProteinData = PPDB
-
-const uniqueProteinData = Array.from(
-    new Map(rawProteinData.map((p) => [p.uniprot_id, p])).values()
-)
+import { useState, useEffect } from 'react'
+import DatabaseHeader from '../features/Database-page/DatabaseHeader'
+import PageFooter from './../ui/PageFooter'
+import { Link } from 'react-router-dom';
 
 export default function Database() {
     const [search, setSearch] = useState('')
+    const [prionData, setPrionData] = useState([])
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
 
-    const filteredData = useMemo(() => {
-        return uniqueProteinData.filter((p) =>
-            `${p.uniprot_id} ${p.EntryName} ${p.ProteinName}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        )
-    }, [search])
+    const fetchData = async () => {
+        try {
+            const res = await fetch(
+                `http://127.0.0.1:3000/api/v1/prion-proteins?page=${page}`,
+                {
+                    method: 'GET',
+                }
+            )
+            const out = await res.json()
+            if (!res.ok) throw new Error('Could not fetch results')
+            setTotalPages(out?.totalPage)
+            setPrionData(out)
+            console.log(out)
+        } catch (err) {
+            console.error(err)
+        }
+    }
 
-    const totalProteins = uniqueProteinData.length
-    const AggregatingCount = uniqueProteinData.filter((p) => p['Aggregating-like'] === 'Yes').length
+    useEffect(
+        function () {
+            fetchData(page)
+        },
+        [page]
+    )
 
     return (
         <div className="min-h-screen font-sans text-white">
-            <header className="flex w-full items-center justify-between border-b border-white/20 bg-[rgb(0,99,154)] px-8 py-4 text-white backdrop-blur-sm">
-                <h1 className="text-2xl font-bold tracking-wide">
-                    PrionPredictorDB
-                </h1>
-                <input
-                    type="text"
-                    placeholder="Search proteins by ID or name..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full border px-4 py-2 text-sm text-black shadow md:max-w-96"
-                />
-                <div className="flex items-center gap-4 text-sm">
-                    <h2 className="cursor-pointer font-semibold">
-                        Documentation
-                    </h2>
-                    <h2 className="cursor-pointer font-semibold">Contact</h2>
-                    <span className="opacity-80">Release v1.0</span>
-                </div>
-            </header>
+            <DatabaseHeader search={search} setSearch={setSearch} />
 
             <main className="px-6 py-12 md:px-20">
                 <div className="mb-4 flex flex-col gap-3 text-[#1e3c72] md:flex-row md:items-center md:justify-between">
                     <h2 className="w-fit text-2xl font-bold">Prion Database</h2>
                     <div className="flex items-center gap-3 text-sm">
-                        <span>
-                            Showing {filteredData.length} / {totalProteins}{' '}
-                            proteins
-                        </span>
+                        <span>Showing {prionData?.result} proteins</span>
                         <span className="text-green-600">
-                            ({AggregatingCount} Aggregating-like)
+                            {prionData?.aggregating} Aggregating-like
                         </span>
                     </div>
                 </div>
@@ -77,21 +67,20 @@ export default function Database() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-blue-100">
-                            {filteredData.map((protein, idx) => (
+                            {prionData?.data?.data?.map((protein, idx) => (
                                 <tr
                                     key={protein.uniprot_id + idx}
                                     className="odd:bg-white even:bg-blue-50/40 hover:bg-blue-50"
                                 >
                                     <td className="px-4 py-2 font-mono text-blue-700 underline">
-                                        <a
-                                            href={`https://www.uniprot.org/uniprotkb/${protein.uniprot_id}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <Link
+                                            to={`/database/${protein.uniprot_id}`}
+                                            className="cursor-pointer text-blue-600 hover:underline"
                                         >
                                             {protein.uniprot_id}
-                                        </a>
+                                        </Link>
                                     </td>
-                                    <td className="px-4 py-2">
+                                    <td className="px-4 py-4">
                                         {protein['Entry Name']}
                                     </td>
                                     <td className="px-4 py-2">
@@ -106,7 +95,8 @@ export default function Database() {
                                     <td className="px-4 py-2">
                                         <span
                                             className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${
-                                                protein['Aggregating-like'] === 'Yes'
+                                                protein['Aggregating-like'] ===
+                                                'Yes'
                                                     ? 'bg-green-100 text-green-700'
                                                     : 'bg-red-100 text-red-700'
                                             }`}
@@ -128,12 +118,29 @@ export default function Database() {
                             ))}
                         </tbody>
                     </table>
+                    <div className="flex items-center justify-between border border-t-2 bg-stone-50 px-4 py-3">
+                        <span className="text-gray-400">Page {page}</span>
+                        <div className="space-x-2">
+                            <button
+                                disabled={page == 1}
+                                onClick={() => setPage((page) => page - 1)}
+                                className="rounded border border-stone-300 bg-white px-3 py-1 text-gray-400 disabled:opacity-40"
+                            >
+                                Prev
+                            </button>
+                            <button
+                                disabled={page == totalPages}
+                                onClick={() => setPage((page) => page + 1)}
+                                className="rounded border border-stone-300 bg-white px-3 py-1 text-gray-400 disabled:opacity-40"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </main>
 
-            <footer className="bg-stone-200 py-4 text-center text-sm text-stone-600">
-                © 2025 PrionPredictorDB — All rights reserved.
-            </footer>
+            <PageFooter />
         </div>
     )
 }
