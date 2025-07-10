@@ -4,6 +4,7 @@ import { ProteinMetadataCard } from '../features/details-page/ProteinMetadataCar
 import { PrdInfoPanel } from '../features/details-page/PrdInfoPanel'
 import { NglViewer } from '../features/details-page/NGLviewer'
 import PageFooter from '../ui/PageFooter'
+import AggreScan3dChart from '../features/details-page/AggreScan3dChart'
 
 function PrionDetails() {
     const { id } = useParams()
@@ -33,7 +34,7 @@ function PrionDetails() {
                 <h1 className="text-2xl font-bold tracking-wide">
                     PrionPredictorDB
                 </h1>
-                
+
                 <div className="flex items-center gap-4 text-sm">
                     <h2 className="cursor-pointer font-semibold">
                         Documentation
@@ -43,23 +44,24 @@ function PrionDetails() {
                 </div>
             </header>
 
-            <main className="mx-auto max-w-6xl px-6 py-12">
-                
+            <main className="flex flex-col gap-6 px-6 py-12 md:px-20">
+                <h2 className="text-2xl font-semibold text-[#1e3c72] shadow-sm">
+                    Prion - {id}
+                </h2>
 
-                <div className="flex flex-col gap-6">
-                    <ProteinMetadataCard data={proteinData} />
-                    <PrdInfoPanel data={proteinData} />
-                </div>
+                <ProteinMetadataCard data={proteinData} />
+                <PrdInfoPanel data={proteinData} />
+                {fileData?.a3d_csv && (
+                    <AggreScan3dChart csv_url={fileData.a3d_csv} />
+                )}
 
-                <div className="mt-10">
-                    {fileData?.pdb && (
-                        <NglViewer
-                            pdbUrl={fileData.pdb}
-                            centroidsUrl={fileData.centroids}
-                        />
-                    )}
-                </div>
-             
+                {fileData?.pdb && (
+                    <NglViewer
+                        pdbUrl={fileData.pdb}
+                        centroidsUrl={fileData.centroids}
+                        clusteringUrl={fileData.clustering}
+                    />
+                )}
             </main>
 
             <PageFooter />

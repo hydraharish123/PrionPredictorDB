@@ -3,8 +3,8 @@ export function ProteinMetadataCard({ data }) {
     console.log(data)
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-6 text-[#1e3c72] shadow-sm">
-            <h2 className="mb-4 text-xl font-semibold tracking-wide text-[#1e3c72]">
-                Protein Metadata
+            <h2 className="mb-4 text-2xl font-semibold tracking-wide text-[#1e3c72]">
+                Metadata
             </h2>
             <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
                 <div>
