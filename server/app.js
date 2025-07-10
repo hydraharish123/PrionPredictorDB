@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const path = require("path");
 
 const proteinRoute = require("./routes/proteinRoute");
 const AppError = require("./utils/appError");
@@ -16,6 +17,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json());
+app.use("/files", express.static(path.join(__dirname, "../data")));
 // app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {

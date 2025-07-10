@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Protein = require("./../models/proteinModel");
+const File = require("./../models/fileModel");
 
 dotenv.config({ path: "./../config.env" });
 
@@ -14,11 +15,13 @@ mongoose.connect(DB).then((con) => {
   console.log("DB connection successfull");
 });
 
-const prions = JSON.parse(fs.readFileSync(`${__dirname}/PPDB.json`, "utf-8"));
+const files = JSON.parse(
+  fs.readFileSync(`${__dirname}/file_paths.json`, "utf-8")
+);
 
 const importData = async () => {
   try {
-    await Protein.create(prions);
+    await File.create(files);
     console.log("Data loaded");
   } catch (err) {
     console.log(err);
@@ -27,7 +30,7 @@ const importData = async () => {
 };
 const deleteData = async () => {
   try {
-    await Protein.deleteMany();
+    await File.deleteMany();
     console.log("Data deleted");
   } catch (err) {
     console.log(err);
