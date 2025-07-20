@@ -1,0 +1,2014 @@
+{% extends "index.html" %}
+
+    {% block indexuniq %}
+    {% endblock %}
+    {% block header %}
+    <title>Aggrescan3D: {{info['project_name']}}</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/jquery.dataTables.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/dataTables.bootstrap.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/linechart.css')}}">
+    <link
+    href="https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css"
+    rel="stylesheet" type="text/css">
+    <script>
+        var table="";
+    </script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/d3.min.js')}}"></script>
+    {% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+
+
+<!-- Nav tabs -->
+        <div id ="tabs">
+<ul class="nav nav-tabs" role="tablist" >
+    <li id="manage-tab"><a href="#manage" role="tab" data-toggle="tab"><i class="fa fa-gears"></i> Manage project</a></li>
+    <li id="summary-tab"><a href="#summary" role="tab" data-toggle="tab"><i class="fa fa-info"></i> Project details</a></li>
+  {% if info['status'] == 'done' %}
+    <li id="plot-tab"><a href="#plots" onclick="dT()" role="tab" data-toggle="tab"><i class="fa fa-line-chart"></i> Aggrescan3D plot </a></li>
+    <li id="a3dvalues-tab" class="active"><a href="#a3dvalues" role="tab" data-toggle="tab"><i class="fa fa-table"></i> Aggrescan3D score </a></li>
+    <li id="structure-tab"><a href="#structure" role="tab" data-toggle="tab"><i class="fa fa-flask"></i> Structure </a></li>
+    {% if info['dynamic'] %}
+        <li id="dynamic-tab"><a href="#dynamic" role="tab" data-toggle="tab" ><i class="fa fa-flask"></i> Dynamic mode details </a></li>
+    {% endif %}
+    {% if info['auto_mutation'] %}
+        <li id="auto-tab"><a href="#auto" role="tab" data-toggle="tab" ><i class="fa fa-flask"></i> Automated mutations </a></li>
+    {% endif %}
+    <li id="gallery-tab"><a href="#gallery" id='test-tab' role="tab" data-toggle="tab" onclick="getGallery()"><i class="fa fa-picture-o"></i> Gallery </a></li>
+
+  {% endif %}
+</ul>
+        </div>
+<!-- Tab panes -->
+<div class="tab-content">
+
+    <div class="tab-pane fade" id="manage">
+        <div class="container">
+            <div class="row">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><i class="fa fa-wrench"></i> Settings</div>
+                    <div class="panel-body"></div>
+                    <table class="table table-striped">
+                    <tr>
+                        <td class="col-md-3">
+                            <strong> Change the job status manually </strong>
+                            <br><i>Statuses done and error mean the program will no longer automatically try to guess what the status is.
+                                Set to running if you wish for the program to guess the actual status. </i> </td>
+                        <td class="col-md-9">
+                            <a class="btn btn-success" id="btn_done" onclick="change_status(this)" data-status="done"><i class="fa fa-heart"></i> Done</a>
+                            <a class="btn btn-danger" id="btn_error" onclick="change_status(this)" data-status="error"><i class="fa fa-ban"></i> Error</a>
+                            <a class="btn btn-info" id="btn_running" onclick="change_status(this)" data-status="running"><i class="fa fa-play"></i> Running</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-3">
+                            <strong> Rerun this job </strong>
+                            <br><i> Delete the log and start the job again with the same settings and in the same working directory </i> </td>
+                        <td class="col-md-9">
+                            <a class="btn btn-warning" id="btn_rerun" onclick="rerun_job()"><i class="fa fa-refresh"></i> Rerun this job</a>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-3">
+                            <strong> Delete this job </strong>
+                            <br><i> If you no longer need the data or just don't want this project to populate the queue page simply delete it. </i> </td>
+                        <td class="col-md-9">
+                            <a class="btn btn-warning" id="btn_delete" onclick="delete_job()"><i class="fa fa-cut"></i> Remove from database</a>
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" style="font-weight:normal" title="Remove the job from database (hence the queue too) and keep all the files intact."><i class="fa fa-info-circle"></i></span>
+
+                            <a class="btn btn-danger" id="btn_hard_delete" onclick="hard_delete_job()"><i class="fa fa-crosshairs"></i> Remove and delete files</a>
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" style="font-weight:normal" title="Remove the job from database. Delete all aggrescan files (and anything in tmp directory of working dir) and remove the working dir if its empty afterwards."><i class="fa fa-info-circle"></i></span>
+                        </td>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="tab-pane fade {% if info['status'] != 'done' %} in active {% endif %}" id="summary">
+    <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+            <h3>
+                Project name: {{info['project_name']}}
+            </h3>
+
+        </div>
+        <div class="col-md-2">
+            <h4>Status:  {{info['status_color']|safe}}</h4>
+            <h6>Started: {{info['started']}}</h6>
+        </div>
+        {% if info['status'] == 'running' %}
+            <div class="col-md-4">
+                <a class="btn btn-warning" id="btn_stop" onclick="stop_job()"><i class="fa fa-stop"></i> Stop the job</a>
+                <span data-toggle="tooltip" rel='tooltip' data-placement="bottom" style="font-weight:normal" title="Stop the job and set status to error (this terminates all the aggrescan-related processes)"><i class="fa fa-info-circle"></i></span>
+                &nbsp &nbsp
+                <a class="btn btn-danger" id="btn_hard_stop" onclick="hard_stop_job()"><i class="fa fa-crosshairs"></i> Stop and delete files</a>
+                <span data-toggle="tooltip" rel='tooltip' data-placement="bottom" style="font-weight:normal" title="Stop the job, delete all the aggrescan files in working directory and remove the job from database."><i class="fa fa-info-circle"></i></span>
+
+            </div>
+        {% endif %}
+        </div>
+        <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-wrench"></i> Settings</div>
+            <div class="panel-body">
+            </div>
+
+      <table class="table table-striped">
+
+        <tr>
+            <td class="col-md-3"><strong>
+                    Working directory
+                </strong>
+            </td>
+            <td class="col-md-9">
+                <span class='sequence'>{{info['working_dir']|safe}}</span>
+            </td>
+        </tr>
+          <tr>
+              <td><strong>Chain sequence(s) </strong></td>
+               <td> <span class='sequence'>{{info['chain_sequence']|safe}}</span></td>
+        </tr>
+        <tr>
+            <td><strong>Selected Chain(s)</strong></td>
+            <td>{{",".join(info['chains'])}}  </td>
+        </tr>
+        <tr>
+            <td><strong>Distance of aggregation</strong></td>
+            <td>{{info['distance']}} Å </td>
+        </tr>
+         <tr>
+            <td><strong>FoldX usage</strong></td>
+            <td>{{info['foldx']}}  </td>
+        </tr>
+        <tr>
+            <td><strong>Dynamic mode</strong></td>
+            <td>
+                {% if info['dynamic']==1 %}
+                    Yes
+                 {% else %}
+                    No
+                 {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Automated mutations</strong></td>
+                <td>
+                    {% if  info['auto_mutation_used'] %}
+                        Yes
+                     {% else %}
+                        No
+                     {% endif %}
+                </td>
+        </tr>
+
+
+    {% if info['mutate']==1 %}
+        <tr>
+            <td><strong>
+                    Mutated residues</strong>
+                        <span data-toggle="tooltip" rel='tooltip' data-placement="right" style="font-weight:normal" title="format: old residue name, chain, residue index, new residue name"><i class="fa fa-info-circle"></i></span>
+            </td>
+            <td>
+                <span class='sequence'>{{ ",".join(info['mutation'].values()) }}
+                </span>
+            </td>
+        </tr>
+        <tr><td><strong>
+			Energy difference between WT (input) and mutated protein (by FoldX)</strong>
+                        <span data-toggle="tooltip" rel='tooltip' data-placement="right" style="font-weight:normal" title="The mutation effect on protein stability. Negative and positive values indicate stabilization and destabilization, respectively."><i class="fa fa-info-circle"></i></span>
+
+		</td>
+            <td>{{info['mutt_energy_diff']}} kcal/mol
+            {% if info['mutt_energy_diff']|float > 1.0  %}
+                <p style="color:red" ><strong>CAUTION: Your mutation/s can destabilize the protein structure</strong></p>
+                {% endif %}
+        </td>
+
+        </tr>
+    {% endif %}
+
+      </table>
+        </div>
+              <h3>
+                Simulation's log
+            </h3>
+                <div class="agg_log"></div>
+        </div>
+    </div>
+  </div> <!-- end tab summary -->
+    {% if info['status'] == 'done' %}
+  <div class="tab-pane fade" id="plots">
+      <div class="container">
+        <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <i class="fa fa-info-circle"></i> Drag cursor over the plot to display residue labels.
+        </div>
+
+	<div class="row">
+		<div class="col-md-2">
+                    <div id="menu">
+                            <strong>Show chain:</strong> 
+                            <select>
+                            {% for chain in info['chains'] %} <option value={{chain}}> {{chain}} </option> {% endfor %}
+                            </select>
+                    </div>
+		</div>
+ 		    <div class="col-md-1"> </div>
+		    <div class="col-md-2">
+			<div class="checkbox" style="position: absolute; top:-7px;">
+				<input type="checkbox" id="checkboxx" > Show buried residues 
+			</div>
+		    </div>
+	</div>
+
+	<div class="row">
+            <div class="col-md-12" id="chartpar">
+                <hr>
+                <div id="chart"></div>		
+            </div>
+        </div>
+      </div>
+  </div> <!-- end tab models -->
+  <div class="tab-pane fade in active" id="a3dvalues">
+      <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <dl class="dl-horizontal">
+                        <dt>
+                        Minimal score value
+                        </dt>
+                        <dd>
+                        <span data-original-title="Value of the most soluble residue in the structural context." data-toggle="tooltip" rel="tooltip" data-placement="right" title=""><i class="fa fa-info-circle"></i></span> 
+                        {{info['table']['min']|round(4)}}
+                        </dd>
+                        <dt>
+                        Maximal score value
+                        </dt>
+                        <dd>
+                        <span data-original-title="Value of the most aggregation-prone residue in the structural context." data-toggle="tooltip" rel="tooltip" data-placement="right" title=""><i class="fa fa-info-circle"></i></span> 
+                        {{info['table']['max']|round(4)}}
+                        </dd>
+                        <dt>
+                        Average score
+                        </dt>
+                        <dd>
+                        <span data-original-title="A normalized indicator of the aggregation propensity/solubility of the protein structure. Allows comparing the solubility of different protein structures.It also allows assessing changes in solubility promoted by amino acid substitutions in a particular protein structure. The more negative the value, the highest the normalized solubility." data-toggle="tooltip" rel="tooltip" data-placement="right" title=""><i class="fa fa-info-circle"></i></span> 
+                        {{info['table']['avg']|round(4)}}
+                        </dd>
+                        <dt>
+                        Total score value
+                        </dt>
+                        <dd>
+                        <span data-original-title="A global indicator of the aggregation propensity/solubility of the protein structure. It depends on the protein size. It allows assessing changes in solubility promoted by amino acid substitutions in a particular protein structure. The more negative the value, the highest the global solubility." data-toggle="tooltip" rel="tooltip" data-placement="right" title=""><i class="fa fa-info-circle"></i></span> 
+                        {{info['table']['sum']|round(4)}}
+                        </dd>
+                    </dl>
+
+                </div>
+
+            </div>
+      <p class='hyphenate'>The table below lists A3D score for protein residues. 
+      
+      <!-- Residues with A3D score = 0.0000 are considered as not influent for aggregation propensity and consequently omitted by default (<button class="btn btn-info btn-xs" onClick="tog()"><i class="fa fa-eye-slash"></i> show/hide</button> these residues). --> Residues with A3D score &gt; 0.0000 are marked by yellow rows.</p>
+              <table id="a3table" class="table table-hover table-responsive">
+                  <thead>
+                      <tr>
+                          <th>residue index </th>
+                          <th>residue name </th>
+                          <th>chain </th>
+                          <th>Aggrescan3D score </th>
+                          <th>mutation</th>
+                      </tr>
+                  </thead>
+                  <tfoot>
+                      <tr>
+                          <th>residue index </th>
+                          <th>residue name </th>
+                          <th>chain </th>
+                          <th>Aggrescan3D score </th>
+                          <th>
+                            <form id="form" method="POST" action="{{url_for('up_remutation')}}">
+                                <input type="hidden" name="oldjid" value="{{jid}}">
+                                mutation <span class="pull-right">
+                                <span data-toggle="tooltip" rel='tooltip' data-placement="left" style="font-weight:normal" title="Submit again this task with same prediction parameters, but new mutated residues."><i class="fa fa-info-circle"></i></span>
+                                    <button type="submit" disabled class=" btn-xs btn btn-success" id="mutenable"><i class="fa fa-gears"></i> Submit</button></span>
+                            </form>
+                          </th>
+                      </tr>
+                  </tfoot>
+                <tbody>
+                    {% for row in info['table']['tab'] %}
+                        <tr>
+                            <td class="text-right">{{row[0]}}</td>
+                            <td class="text-right">{{row[1]}}</td>
+                            <td class="text-right">{{row[2]}}</td>
+                            <td class="text-right">{{row[3]}}</td>
+                            <td>
+                            {% if row[2]+row[0] in info['mutation'].keys() %}<span class="label label-primary">mutated: {{info['mutation'][row[2]+row[0]]}}</span>{%endif %}
+                            <button id="RES{{row[2]+row[1]+row[0]}}" data-chain="{{row[2]}}" data-ressk="{{row[1]}}" data-resid="{{row[0]}}" class="tomut pull-right btn btn-xs btn-success">mutate</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+                  </table>
+  </div>
+  </div> <!-- end tab a3dvalues -->
+  <div class="tab-pane fade" id="structure" >
+      <div class="container">
+          <div class="alert alert-info alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <i class="fa fa-info-circle"></i> 3Dmol can be expensive computationally for big molecules. If you experience lag or delay click on the "Play the video" button instead.
+          </div>
+      <div class="row">
+        <div class="col-md-9">
+            <div id="3Dmol-viewer" data-backgroundcolor="white" class="mol-container"></div>
+        </div>
+        <div class="col-md-3">
+
+            <table class="snapshot-panel-1">
+                <tr><td>
+                    <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="View the structure in an interactive way"><i class="fa fa-exclamation-circle"></i></span>
+                    <a class="btn btn-success" id="3Dmol" onclick="load3Dmol(this)" data-filename="{{url_for('ustatic', jobid=jid, filename='output.pdb')}}"><i class="fa fa-eye"></i> View in 3Dmol</a>
+                </td></tr>
+        <tr><td>
+            <div id="animation_btn">
+                    <a class="btn btn-info" onclick="changeAnimation()" ><i class="fa fa-play"></i> Start animation</a>
+            </div>
+        </td></tr>
+        <tr><td>
+                <form id="data_1" class="submit_snapshot" method="post" enctype="multipart/form-data">
+
+                    <input name="text" type="text" id="text_1" maxlength="30" size="15" style="font-size:14pt"  placeholder="Custom snapshot name" value="{{'%s' % (info['project_name'][:6])}}"/>
+
+                    <button class="btn btn-info" id="download_pic_1"  value="Submit Button" ><i class="fa fa-eye"></i>Take snapshot</button>
+                </form>
+        </td></tr>
+        <tr><td>
+          <div id="snapshot_info_1">
+          </div>
+        </td></tr>
+                <tr><td>
+                            <form id="label_1" class="label_residue" method="post" enctype="multipart/form-data">
+                            <input name="text" type="text" id="get_label_1" maxlength="30" size="15" style="font-size:14pt" placeholder="ResID+ChainID (12A)" value=""/>
+                            <button class="btn btn-info" id="submit_label_1"  value="Submit Button"><i class="fa fa-eye"></i>Label residue</button>
+                        </form>
+                </td></tr>
+        <tr><td>
+                <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Show labels of aggregation-prone residues"><i class="fa fa-exclamation-circle"></i></span>
+                <button class="btn btn-info" id="show_labels_1" onclick="showLabels(1)"><i class="fa fa-eye"></i>Show labels</button>
+        </td></tr>
+                <tr>       <td><div class="dropdown">
+                      <button class="btn btn-drop" id="delete_labels_1" onclick="showOptions('1')"><i class="fa fa-remove"></i> Delete label(s)</button>
+                                  <div id="dropdown_1" class="dropdown-content">
+                                  </div>
+                            </div></td></tr>
+        <tr><td>
+                <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="View the structure as a WEBM vide"><i class="fa fa-exclamation-circle"></i></span>
+                <a class="btn btn-success" id="Video" onclick="loadVideo(this)" data-filename="{{url_for('ustatic', filename='clip.webm', jobid=jid)}}"><i class="fa fa-eye"></i> Play the video</a>
+        </td></tr>
+        </table>
+        </div>
+
+      </div>
+      </div>
+  </div> <!-- end structure -->
+
+    {% if info['dynamic'] %}
+  <div class="tab-pane fade" id="dynamic">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="panel panel-primary" id="confo">
+                    <div class="panel-heading">
+			            <p><strong><h4>CABS-flex predictions of flexibility of input structure </h4></strong></p>
+	   	            </div>
+                    <div class="panel-body">
+
+                        <p class="text-justify"> In dynamic mode, A3D analysis is performed on the set of models reflecting fluctuations of the input structure (predicted
+                        by CABS-flex method, models are numbered from 0 to 11) and the input model. A CABS_average model is also provided where each of the residue's scores
+                            is averaged between CABS models and projected onto the input structure.
+                        Their A3D scores are provided below in the table. <br>
+                        The right panel presents comparison of the most aggregation prone model (with the highest A3D score, {{info['table']['avg']|round(4)}} in this case) with the input model
+                        (the most aggregation prone model in blue, input in red) and RMSF plot which shows the extent of residue fluctuations in Angstroms (predicted by CABS-flex</a>).
+                        </p>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <div class="row">
+              {% if info['model_files'] == 'ok' %}
+              <div class="col-md-5">
+                  <table class="table-condensed table">
+                    <tr>
+                        <td><h5><strong>Model</strong></h5></td>
+                        <td><h5><strong>Average A3D Score</strong></h5></td>
+                        <td></td>
+                    </tr>
+                    {% for model in info['avg_scores'] %}
+                        <tr name="row_{{model.split('.')[0]}}" class="not_current">
+                            <td>{{model.split(".")[0]}}</td>
+                            <td>{{info['avg_scores'][model]}}</td>
+                            <td><a class="btn btn-success" id="{{model.split('.')[0]}}" onclick="load_cabs_3dmol(this)" data-filename="{{url_for('ustatic', filename=model, jobid=jid)}}"><i class="fa fa-eye"></i> View in 3Dmol</a>
+</td>
+                        </tr>
+                    {% endfor %}
+                  </table>
+                  &nbsp;
+              </div>
+              <div class="col-md-7">
+                  <div class="row">
+                    <div id="cabs_model_viewer"></div>
+                  </div>
+                  <div class="row">
+                   <table class="snapshot_panel">
+                          <tr>
+                        <form id="data_2" class="submit_snapshot" method="post" enctype="multipart/form-data">
+                            <td><input name="text" type="text" id="text_2" maxlength="30" size="22" style="font-size:14pt" placeholder="Custom snapshot name" value="{{'%s' % (info['project_name'][:6])}}"/></td>
+                            <td><button class="btn btn-info btn-viewer" id="download_pic_2"  value="Submit Button"><i class="fa fa-eye"></i>Take snapshot</button></td>
+                        </form>
+                        <form id="label_2" class="label_residue" method="post" enctype="multipart/form-data">
+                            <td><input name="text" type="text" id="get_label_2" maxlength="30" size="10" style="font-size:14pt" placeholder="12A, 15B, etc" value=""/></td>
+                        <td><button class="btn btn-info btn-viewer" id="submit_label_2"  value="Submit Button"><i class="fa fa-eye"></i>Label residue(s)</button></td>
+                        </form>
+                          </tr>
+                       <tr class="row-break"><td></td></tr>
+                          <tr>
+                        <td><button class="btn btn-info btn-viewer" id="show_labels_2" onclick="showLabels(2)"><i class="fa fa-eye"></i> Show aggregation prone labels</button></td>
+                              <td><div class="dropdown">
+                      <button class="btn btn-drop" id="delete_labels_2" onclick="showOptions('2')"><i class="fa fa-remove"></i> Delete label(s)</button>
+                                  <div id="dropdown_2" class="dropdown-content">
+                                  </div>
+                            </div></td>
+                          </tr>
+                      </table>
+                  </div>
+                  <div class="row" id="snapshot_info_2">
+                  </div>
+              </div>
+          </div>
+          <div class="row">
+              <div id="dyn_bokeh"></div>
+          </div>
+            <div class="row">
+              <div class="col-md-6">
+                <img width=100% src="{{url_for('ustatic', jobid=jid, filename='CABSflex_supe.png')}}" class="img-responsive">
+              </div>
+             <div class="col-md-6">
+                <img width=100% src="{{url_for('ustatic', jobid=jid, filename='CABSflex_rmsf.png')}}" class="img-responsive">
+             </div>
+              {% else %}
+                               <h2><p style="color:red;padding-left: 12px" ><strong>
+                                Models were not found for this run. Use verbosity 2 or higher to save models when running Aggrescan3D from command line.
+          </strong></h2></p>
+                <div class="col-md-5">
+                  <table class="table-condensed table">
+                    <tr>
+                        <td><h5><strong>Model</strong></h5></td>
+                        <td><h5><strong>Average A3D Score</strong></h5></td>
+                    </tr>
+                    {% for model in info['avg_scores'] %}
+                        <tr>
+                            <td>{{model.split(".")[0]}}</td>
+                            <td>{{info['avg_scores'][model]}}</td>
+                        </tr>
+                    {% endfor %}
+                  </table>
+                  &nbsp;
+              </div>
+              <div class="col-md-7">
+                    <img width=100% src="{{url_for('ustatic', jobid=jid, filename='CABSflex_rmsf.png')}}" class="img-responsive">
+                    <img width=100% src="{{url_for('ustatic', jobid=jid, filename='CABSflex_supe.png')}}" class="img-responsive">
+
+
+              </div>
+
+              {% endif %}
+          </div>
+      </div>
+  </div> <!-- dynamic end -->
+{% endif %} <!-- dynamic if -->
+
+        {% if info['auto_mutation'] %}
+  <div class="tab-pane fade" id="auto">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="panel panel-primary" id="auto_conf">
+                    <div class="panel-heading">
+			            <p><strong><h4>Automated mutations analysis </h4></strong></p>
+	   	            </div>
+                    <div class="panel-body">
+
+                        <p class="text-justify"> In the automated mutations mode, the server selects aggregation prone resides
+                             and each selected residue is mutated to glutamic acid, lysine, aspartic acid and arginine.
+                            The table below shows 2 best scored mutants for each mutated residue. Protein variants
+                            are ordered according to the mutation effect they had on protein stability
+                            (energetic effect) together with the difference in the average per-residue aggregation score
+                            between the wild type and the mutant (in the table green values indicate a positive change,
+                            grey are neutral, and orange/red mean destabilizing or more aggregation prone mutants). A summary csv file can be
+                            found in the working dir under the name of Mutations_summary.csv.
+                        </p>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <div class="row">
+              <!--Check if the data is actually loaded-->
+              {% if info['autom_data'].values()[0] %}
+              <div class="col-md-5">
+                  <table class="table-condensed table">
+                    <tr>
+
+                        <td>
+                            <h5><strong>Mutant</strong></h5>
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Mutaion code: old residue, new residue , residue ID, chain ID"><i class="fa fa-info-circle"></i></span>
+                        </td>
+                        <td>
+                            <h5><strong>Energetic effect</strong></h5>
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Energy difference between the original residue and mutant (kcal/mol)"><i class="fa fa-info-circle"></i></i></span>
+                            </td>
+                        <td>
+                            <h5><strong>Score comparison</strong></h5>
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Difference between average A3D scores (the lower the number the less aggregation prone mutant should be)"><i class="fa fa-info-circle"></i></span>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% for mutation, data in info['autom_data'].iteritems() %}
+                        <tr name="row_{{mutation}}" class="not_current">
+                            <td>{{mutation}}</td>
+                            <td class="{{info['autom_energy'][mutation]}}">{{data[0]}}</td>
+                            <td class="{{info['autom_score'][mutation]}}">{{data[2]}}</td>
+                            <td><a class="btn btn-success btn-see-mutant" id="{{mutation}}" onclick="load_mutant_3dmol(this)" data-filename="{{url_for('ustatic', filename=mutation+'.pdb', jobid=jid)}}"><i class="fa fa-eye"></i>View</a></td>
+                            <!--<td><a class="btn btn-primary btn-download-mutant" id="{{mutation}}_pdb" href="{{url_for('ustatic', filename=mutation+'.csv', jobid=jid)}}"><i class="fa fa-download"></i>CSV</a></td>-->
+                            <!--<td><a class="btn btn-primary btn-download-mutant" id="{{mutation}}_csv" href="{{url_for('ustatic', filename=mutation+'.pdb', jobid=jid)}}"><i class="fa fa-download"></i>PDB</a></td>-->
+
+                        </tr>
+                    {% endfor %}
+                  </table>
+                  &nbsp;
+              </div>
+              <div class="col-md-7">
+                  <div class="row">
+                    <div id="mutant_model_viewer"></div>
+                  </div>
+                  <div class="row">
+                      <table class="snapshot_panel">
+                          <tr>
+                        <form id="data_3" class="submit_snapshot" method="post" enctype="multipart/form-data">
+                            <td><input name="text" type="text" id="text_3" maxlength="30" size="22" style="font-size:14pt" placeholder="Custom snapshot name" value="{{'%s' % (info['project_name'][:6])}}"/></td>
+                            <td><button class="btn btn-info btn-viewer" id="download_pic_3"  value="Submit Button"><i class="fa fa-eye"></i>Take snapshot</button></td>
+                        </form>
+                        <form id="label_3" class="label_residue" method="post" enctype="multipart/form-data">
+                            <td><input name="text" type="text" id="get_label_3" maxlength="30" size="10" style="font-size:14pt" placeholder="12A, 13B, etc" value=""/></td>
+                            <td><button class="btn btn-info btn-viewer" id="submit_label_3"  value="Submit Button"><i class="fa fa-eye"></i>Label residue(s)</button></td>
+                        </form>
+                          </tr>
+                          <tr class="row-break"><td></td></tr>
+                          <tr>
+                        <td><button class="btn btn-info btn-viewer" id="show_labels_3" onclick="showLabels(3)"><i class="fa fa-eye"></i> Show aggregation prone labels</button></td>
+                              <td><div class="dropdown">
+                      <button class="btn btn-drop" id="delete_labels_3" onclick="showOptions('3')"><i class="fa fa-remove"></i> Delete label(s)</button>
+                                  <div id="dropdown_3" class="dropdown-content">
+                                      <!--<a href="javascript:void(0)" onclick="removeLabels(3, 'All')">All</a>-->
+                                  </div>
+                            </div></td>
+                          </tr>
+                      </table>
+                  </div>
+                  <div class="row" id="snapshot_info_3">
+                  </div>
+              </div>
+          </div>
+          <div class="row">
+              <div id="mut_bokeh"></div>
+          </div>
+
+              {% else %}
+                {% if info['autom_data'].keys()[0] == "Data missing" %}
+          <h3>Your working directory seems to be missing the Mutations_summary.csv file which contains data required by this tab to load. (perhaps the job failed or the files were deleted manually?)</h3>
+                {% endif %}
+                {% if info['autom_data'].keys()[0] == "No mutants" %}
+                    <h3>It seems that no suitable candidates for mutation were found. Please see the simualtion's log</h3>
+                {% endif %}
+              {% endif %}
+      </div>
+
+
+  </div> <!-- auto mutation end -->
+{% endif %} <!-- auto mutation if -->
+
+         <div class="tab-pane fade" id="gallery">
+             <div id="no_pics"></div>
+             <div class="container" id="actual_gallery">
+                <table class="gallery-table" id="gallery-table">
+
+                </table>
+             </div>
+         </div>
+{% endif %} <!-- done if -->
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<!-- Small modal -->
+
+<div class="modal fade" id="alercja" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="laba">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="laba">Mutate residue</h4>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-md-4" id="resfrom"></div>
+              <div class=col-md-8 id="resto">
+              
+                  <h2>To:</h2>
+                  <div style="overflow-y:auto;height:200px">
+                    <div class="list-group" style="width:95%">
+                        {% for row in aa_dict %}
+                        <a data-dismiss="modal" onClick="replaceResidue(this)" href="#" id="replace{{row[0]}}" data-ressk="{{row[2]}}" class="list-group-item" data-resname="{{row[0]}}">
+                            <h2><img class="img-thumbnail" width="100" src="{{url_for('static', filename='img/aa/'+row[2]+'.svg')}}"> {{row[0]}} <small>{{row[1]}}</small></h2> </a>
+                        {% endfor %}
+                    </div>
+                  </div>
+              </div>
+    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-undo"></i> Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+
+
+
+
+{% endblock %}
+{% block below_js %}
+<script src="{{url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
+<!-- 3DMol without jQuery -->
+<script src="{{url_for('static', filename='js/3Dmol-nojquery.js')}}"></script>
+
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
+
+<script>
+
+
+    var aa_dict_F ={'A': 'alanine', 'R': 'arginine','N': 'asparagine','D': 'aspartic acid','C': 'cysteine','E': 'glutamic acid', 'Q': 'glutamine','G': 'glycine','H': 'histidine','I': 'isoleucine','L': 'leucine','K': 'lysine', 'M': 'methionine','F': 'phenylalanine','P': 'proline','S': 'serine','T':'threonine','W': 'tryptophan', 'Y': 'tyrosine', 'V': 'valine', 'X': 'unknown'};
+    var aa_dict ={'A': 'ALA', 'R': 'ARG','N': 'ASN','D': 'ASP','C': 'CYS','E': 'GLU', 'Q': 'GLN','G': 'GLY','H': 'HIS','I': 'ILE','L': 'LEU','K': 'LYS', 'M': 'MET','F': 'PHE','P': 'PRO','S': 'SER','T':'THR','W': 'TRP', 'Y': 'TYR', 'V': 'VAL','X': 'UNK'};
+    var imgsrc = "{{url_for('static', filename='img/aa/G.svg')}}";
+
+function replaceResidue(v) {
+    var oldidx = $('#oldres').data("resid");
+    var oldres = $('#oldres').data("resname");
+    var oldresSK = $('#oldres').data("ressk");
+    var chain = $('#oldres').data("chain");
+    var newres = v.dataset.resname;
+    var newresSK = v.dataset.ressk;
+    var newRow = '<span class="label label-warning">mutate: '+oldresSK+newresSK+oldidx+chain+'</span>';
+    var btn = $("#RES"+chain+oldresSK+oldidx);
+    btn.before(newRow);
+    btn.prop('disabled',true);
+    // hidden form
+    var inp_hid = jQuery('<input type=hidden name="toreplace[]" value="'+oldresSK+newresSK+oldidx+chain+'">');
+    $('#form').append(inp_hid);
+    $("#mutenable").removeAttr("disabled");    
+
+
+
+}
+
+viewer = [];
+viewer_2 = [];
+viewer_3 = [];
+intervals = [];
+rotating = 0;
+current_model ='';
+mutant ='';
+function loadVideo(o) {
+    $('#3Dmol-viewer').empty();
+    $('#3Dmol-viewer').html($('<video width="740px" height="640px" controls="controls" autoplay="autoplay" loop="loop" preload="auto">' +
+        '<source src="' + o.dataset.filename + '" type=\'video/webm;codecs="vp8, vorbis"\'/>'));
+
+}
+
+function showOptions(viewerNumber) {
+    var thisViewer;
+    if (viewerNumber=="1") thisViewer = viewer;
+    if (viewerNumber=="2") thisViewer = viewer_2;
+    if (viewerNumber=="3") thisViewer = viewer_3;
+    var labels = thisViewer.getAllLabels();
+    $('#dropdown_' + viewerNumber).empty();
+    $('#dropdown_' + viewerNumber).append('<a href="javascript:void(0)" onclick="removeLabels(' + viewerNumber + ', \'All\')">All</a>');
+    for (var i = 0; i < labels.length; i++){
+        $('#dropdown_' + viewerNumber).append('<a href="javascript:void(0)" onclick="removeLabels(' + viewerNumber + ', \'' + labels[i].text +'\')">' + labels[i].text + '</a>');
+    }
+    document.getElementById('dropdown_' + viewerNumber).classList.toggle("show");
+
+}
+
+
+function deletePicture(filename) {
+    if(!$.active) {
+        $.ajax({
+            url: '{{url_for("delete_pic")}}',
+            data:  JSON.stringify({'filename': filename}),
+            type: 'POST',
+            async: true,
+            contentType: 'application/json',
+            success: function(response) {
+                $("#test-tab").trigger('click');
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+}
+
+
+function getGallery() {
+    var i;
+    $('#gallery-table').empty();
+    $('#no_pics').empty();
+        $.ajax({
+            url: '{{url_for("get_pics", jobid=jid)}}',
+            type: 'GET',
+            async: true,
+            contentType: 'application/json',
+            success: function(response) {
+                if (response.length == 0) $('#no_pics').html('<p style="font-size:20px">' +
+                    '<strong> There are no snapshots for this project yet. Take some in the Structure, Dynamic or Automated mutations tabs!</strong></p>')
+                else {
+                    for (i=0; i<response.length; ++i){
+                        $('#gallery-table').append(
+                            '<tr>' +
+                            '<td><a href="' +response[i].path +'"> <img class="img-thumbnail img-responsive" width=70% src="' +response[i].path + '"></a></td>' +
+                            '<td><p style="font-size:30px"><b>' + response[i].filename + '</b></p><br>' +
+                            '<p style="font-size:20px"><b> Screenshot taken from ' + response[i].type +' tab. <br>' +
+                            ' Screenshot model - ' + response[i].model + '</b></p>' +
+                            '<button class="btn btn-danger" onclick="deletePicture(\'' + response[i].filename + '\')">Delete this snapshot</button></td>' +
+                            '</tr>'
+                        )
+                    }
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
+}
+
+
+
+function getMutBokeh() {
+    // There might be a slight memory leak on this, not sure
+    $('#mut_bokeh').empty();
+        $.ajax({
+            url: '{{url_for("get_mut_plot", jobid=jid)}}',
+            type: 'POST',
+            async: true,
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            processData: false,
+            success: function(response) {
+                $('#mut_bokeh').append(response['script']);
+                $('#mut_bokeh').append(response['div']);
+            },
+            error: function (error) {
+                console.log(error['responseText']);
+            }
+        });
+
+}
+
+function getDynBokeh() {
+    // There might be a slight memory leak on this, not sure
+    $('#dyn_bokeh').empty();
+        $.ajax({
+            url: '{{url_for("get_dyn_plot", jobid=jid)}}',
+            type: 'POST',
+            async: true,
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            processData: false,
+            success: function(response) {
+                $('#dyn_bokeh').append(response['script']);
+                $('#dyn_bokeh').append(response['div']);
+            },
+            error: function (error) {
+                console.log(error['responseText']);
+            }
+        });
+
+}
+
+function load3Dmol(o) {
+    var file = o.dataset.filename;
+
+    var colorByScore = function(atom) {
+        if (atom.b > 0) {
+            if (atom.b < 0.5) {
+                return "#FF9999";
+            }
+            else if (atom.b < 1) {
+                return "#FF6666";
+            }
+            else if (atom.b < 1.5) {
+                return "#FF3333";
+            }
+            else {
+                return "#FF0000";
+            }
+        }
+
+        else if (atom.b < -0.5) {
+            if (atom.b > -1) {
+                return "#CCCCFF";
+            }
+            else if (atom.b > -1.5) {
+                 return "#9999FF";
+            }
+            else if (atom.b > -2) {
+                return "#6666FF";
+            }
+            else if (atom.b > -2.5) {
+                return "#3333FF";
+            }
+            else {
+                return "#0000FF";
+            }
+        }
+        else {
+            return "#FFFFFF";
+        }
+                  };
+
+    // This still causes memory leaks
+    $('#3Dmol-viewer').height(640).width(740);
+    viewer = $3Dmol.createViewer($('#3Dmol-viewer'))
+    $.get(file, null, function (data) {
+        viewer.clear();
+        viewer.addAsOneMolecule(data, "pdb");
+        viewer.addSurface($3Dmol.SurfaceType.VDW,
+            {opacity:1.0,
+                voldata: data,
+                colorfunc: colorByScore
+            });
+        viewer.zoomTo();
+        viewer.render();
+        if (rotating == 0) {
+        }
+        else {
+            intervals.push(setInterval(function() { viewer.rotate(1); }, 50));
+        }
+    });
+}
+
+
+
+function changeAnimation() {
+    $('#animation_btn').empty();
+    if (rotating == 1) {
+        rotating = 0;
+        for(var i = 0; i < intervals.length; i++){
+            clearInterval(intervals[i]);
+        }
+        $('#animation_btn').html($(' <p class="pull-right"> <a class="btn btn-info" onclick="changeAnimation()" ><i class="fa fa-play"></i> Start animation</a></p>'));
+    }
+      else {
+        rotating = 1;
+        intervals.push(setInterval(function() { viewer.rotate(1); }, 50));
+        $('#animation_btn').html($('<p class="pull-right"> <a class="btn btn-info" onclick="changeAnimation()" ><i class="fa fa-stop"></i> Stop animation</a></p>'));
+    }
+}
+
+function dT() {
+    setTimeout(function () { 
+      $("#chart").height(510);
+      $(window).resize();
+    }, 300);
+}
+
+
+function dummy(){
+    $('#3Dmol').trigger('click');
+}
+
+
+var current_log = '';
+
+function change_status(o) {
+    if(!$.active) {
+        $.ajax({
+            url: '{{url_for("change_job_status", jid=jid)}}',
+            data:  o.dataset.status,
+            type: 'POST',
+            async: true,
+            contentType: 'plain/text',
+            success: function(response) {
+                window.location.reload();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+}
+
+function refresh_status() {
+    var status = '{{info["status"]|safe}}';
+    if(!$.active && ((status != 'done' && status != 'error') || current_log.length == 0)) {$.ajax({
+            url: '{{url_for("get_job_status", jid=jid)}}',
+            type: 'GET',
+            async: true,
+            contentType: 'application/json',
+            success: function (response) {
+                if (current_log.length < response.log.length) {
+                    slice = response.log.slice(current_log.length, response.log.length);
+                    $('.agg_log').append($('<pre>' + slice + '</pre>'));
+                    current_log += slice;
+                }
+                if (response.reload) {
+                    window.location.reload();
+                }
+
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+}
+
+function delete_job() {
+    if(!$.active)
+        {$.ajax({
+            url: '{{url_for("delete_job", jid=jid)}}',
+            type: 'GET',
+            async: true,
+            contentType: 'plain/text',
+            success: function (response) {
+                window.location.replace(response);
+            },
+            error: function (error) {
+                alert("Your query to database failed. Perhaps the job already doesn't exist?");
+                console.log(error);
+            }
+        });
+    }
+}
+
+
+function hard_delete_job() {
+    if (confirm('This action will delete aggrescan files (and anything in folder named "tmp") ' +
+            'and will try to erase an entire directory ' +
+            'if it contains only aggrescan files.\n\nHowever something can always go wrong ' +
+            '(for example name similarities to A3D files). ' +
+            'are you sure that this job\'s directory doesn\'t contain any important files?')) {
+        if (!$.active) {
+            $.ajax({
+                url: '{{url_for("hard_delete_job", jid=jid)}}',
+                type: 'GET',
+                async: true,
+                contentType: 'plain/text',
+                success: function (response) {
+                    window.location.replace(response);
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                }
+            });
+        }
+    }
+}
+
+function stop_job() {
+    if(!$.active)
+        {$.ajax({
+            url: '{{url_for("kill_job", jid=jid)}}',
+            type: 'GET',
+            async: true,
+            contentType: 'plain/text',
+            success: function(response) {
+                window.location.reload(true);
+            },
+            error: function (error) {
+                alert(error.responseText);
+            }
+        });
+    }
+}
+
+function hard_stop_job() {
+    if (confirm('Caution! This function will delete any files contained in "tmp" directory in your working directory!')) {
+        if (!$.active) {
+            $.ajax({
+                url: '{{url_for("kill_delete_job", jid=jid)}}',
+                type: 'GET',
+                async: true,
+                contentType: 'plain/text',
+                success: function (response) {
+                    window.location.replace(response);
+                },
+                error: function (error) {
+                    alert(error.responseText);
+                }
+            });
+        }
+    }
+}
+
+function rerun_job() {
+    if (!$.active) {
+        $.ajax({
+            url: '{{url_for("rerun_job", jid=jid)}}',
+            type: 'GET',
+            async: true,
+            contentType: 'plain/text',
+            success: function (response) {
+                window.location.replace(response);
+            },
+            error: function (error) {
+                alert(error.responseText);
+            }
+        });
+    }
+}
+
+    {% if info['status'] == 'done' %}
+
+ function click_highest_model(){
+    var id = "{{info['avg_scores'].keys()[0].split('.')[0]}}";
+    $('#'+id).trigger('click');
+        getDynBokeh();
+
+}
+ function click_best_mutant(){
+    var id = "{{info['autom_data'].keys()[0]}}";
+    $('#'+id).trigger('click');
+        getMutBokeh();
+
+}
+    {% endif %}
+
+function load_cabs_3dmol(o) {
+    var file = o.dataset.filename;
+    current_model = o.id;
+    // getBokeh(o.id);
+    var colorByScore = function(atom) {
+        if (atom.b > 0) {
+            if (atom.b < 0.5) {
+                return "#FF9999";
+            }
+            else if (atom.b < 1) {
+                return "#FF6666";
+            }
+            else if (atom.b < 1.5) {
+                return "#FF3333";
+            }
+            else {
+                return "#FF0000";
+            }
+        }
+
+        else if (atom.b < -0.5) {
+            if (atom.b > -1) {
+                return "#CCCCFF";
+            }
+            else if (atom.b > -1.5) {
+                 return "#9999FF";
+            }
+            else if (atom.b > -2) {
+                return "#6666FF";
+            }
+            else if (atom.b > -2.5) {
+                return "#3333FF";
+            }
+            else {
+                return "#0000FF";
+            }
+        }
+        else {
+            return "#FFFFFF";
+        }
+                  };
+
+    if (viewer_2.length == 0) {
+        $('#cabs_model_viewer').height(590).width(650);
+        viewer_2 = $3Dmol.createViewer($('#cabs_model_viewer'))
+    }
+    $("tr[name^=row_]").removeClass("current_model");
+    $("tr[name='row_"+o.id+"']").removeClass("not_current");
+    $("tr[name='row_"+o.id+"']").addClass("current_model");
+    $.get(file, null, function (data) {
+        viewer_2.clear();
+        viewer_2.addAsOneMolecule(data, "pdb");
+        // adding surface caused memory leaks, needed to manually change sync value for geometryGroups to true (use callSyncHelper)
+        viewer_2.addSurface($3Dmol.SurfaceType.VDW,
+            {
+                opacity: 1.0,
+                voldata: data,
+                colorfunc: colorByScore
+            });
+        viewer_2.zoomTo();
+        viewer_2.render();
+        });
+
+}
+
+function load_mutant_3dmol(o) {
+    var file = o.dataset.filename;
+    mutant = o.id;
+    var colorByScore = function(atom) {
+        if (atom.b > 0) {
+            if (atom.b < 0.5) {
+                return "#FF9999";
+            }
+            else if (atom.b < 1) {
+                return "#FF6666";
+            }
+            else if (atom.b < 1.5) {
+                return "#FF3333";
+            }
+            else {
+                return "#FF0000";
+            }
+        }
+
+        else if (atom.b < -0.5) {
+            if (atom.b > -1) {
+                return "#CCCCFF";
+            }
+            else if (atom.b > -1.5) {
+                 return "#9999FF";
+            }
+            else if (atom.b > -2) {
+                return "#6666FF";
+            }
+            else if (atom.b > -2.5) {
+                return "#3333FF";
+            }
+            else {
+                return "#0000FF";
+            }
+        }
+        else {
+            return "#FFFFFF";
+        }
+                  };
+
+    if (viewer_3.length == 0) {
+        $('#mutant_model_viewer').height(590).width(650);
+        viewer_3 = $3Dmol.createViewer($('#mutant_model_viewer'))
+    }
+    $("tr[name^=row_]").removeClass("current_model");
+    $("tr[name='row_"+o.id+"']").removeClass("not_current");
+    $("tr[name='row_"+o.id+"']").addClass("current_model");
+    $.get(file, null, function (data) {
+        viewer_3.clear();
+        viewer_3.addAsOneMolecule(data, "pdb");
+        // adding surface caused memory leaks, needed to manually change sync value for geometryGroups to true (use callSyncHelper)
+        viewer_3.addSurface($3Dmol.SurfaceType.VDW,
+            {
+                opacity: 1.0,
+                voldata: data,
+                colorfunc: colorByScore
+            });
+        viewer_3.zoomTo();
+        viewer_3.render();
+        });
+
+}
+
+
+var pic_counter = 0;    // counter should be added to the name as a way of creating unique names for multiple snapshots
+var old_basename = '';  // to detect if the name in text input has changed if so the function will reset the counter
+$("form.submit_snapshot").submit(function(e) {
+    e.preventDefault();
+    // This is hacky, wish I knew the syntax, anyway gets a number, but its string type
+    var viewer_number = e.currentTarget[0].id.split("_")[1];
+    var this_viewer;
+    if (viewer_number=='1') {
+        this_viewer = viewer;
+        var model = "Final model";
+        var type = 'Static';
+    }
+    if (viewer_number=='2') {
+        this_viewer = viewer_2;
+        var model = current_model;
+        var type = 'Dynamic';
+    }
+    if (viewer_number=='3') {
+        this_viewer = viewer_3;
+        var model = mutant;
+        var type = 'Automated mutation';
+    }
+    pic_counter++;
+    var name = $( '#text_'+viewer_number ).val() || "snapshot";
+    var basename = name.split("_")[0];
+    if (old_basename == '') old_basename = basename;
+    else {
+        if (old_basename != basename) {
+            pic_counter = 1;
+            old_basename = basename;
+        }
+    }
+    var new_name = basename+"_"+pic_counter;
+
+    $('#text_'+viewer_number).val(new_name);
+    $.ajax({
+        url: '{{url_for("save_uri", jobid=jid)}}',
+        type: 'POST',
+        data: JSON.stringify({ 'filename': name+".jpeg",
+            'file_content':this_viewer.pngURI(),
+            'type': type,
+            'model': model
+        }),
+        contentType: "application/json;charset=UTF-8",
+        cache: false,
+        processData: false,
+        success: function (response) {
+            var adress = response.split(":")[0];
+            var filename = response.split(":")[1];
+            if (viewer_number=='1')
+                $('#snapshot_info_'+viewer_number).html('<p style="font-size:12px"><b>Snapshot '+ filename + ' saved!</b> <a target="_blank" href="' + adress + '"> See in a new tab </a></p>');
+            else
+                $('#snapshot_info_'+viewer_number).html('<p style="font-size:20px"><b>Snapshot '+ filename + ' saved!</b> <a target="_blank" href="' + adress + '"> See in a new tab </a></p>');
+            },
+        error: function (error) {
+            alert(error.responseText);
+        },
+
+    });
+});
+
+$("form.label_residue").submit(function(e) {
+    e.preventDefault();
+    // This is hacky, wish I knew the syntax, anyway gets a number, but its string type
+    var viewer_number = e.currentTarget[0].id.split("_")[2];
+    var name = $('#get_label_' + viewer_number).val().split(',');
+    for (var i = 0; i < name.length; i++) {
+        addCustomLabel(viewer_number, name[i].trim());
+    }
+});
+
+function showLabels(arg) {
+    var selectAggregationProne = function (atom) {
+        if (atom.b > 0) return true;
+        return false;
+        };
+    var this_viewer;
+    if (arg==1) this_viewer = viewer;
+    if (arg==2) this_viewer = viewer_2;
+    if (arg==3) this_viewer = viewer_3;
+    var sel = this_viewer.selectedAtoms({predicate : selectAggregationProne, byres : true }) ;
+    // The line below works because I manually edieted 3Dmol js file, changing its GLModel addResLabels method
+    // from  var atoms = this.selectedAtoms(sel, atoms);  to var atoms = sel;, the former didn't select anything
+    // (and I don't care enough to fix the function)
+    this_viewer.addResLabels(sel, { backgroundColor: 'darkgreen', backgroundOpacity: 0.8});
+    this_viewer.render();
+
+}
+
+function addCustomLabel(viewerNumber, toLabel) {
+    var select = function (atom) {
+        if (toLabel == atom.rescode + atom.chain) return true;
+        return false;
+        };
+    var this_viewer;
+    if (viewerNumber=="1") this_viewer = viewer;
+    if (viewerNumber=="2") this_viewer = viewer_2;
+    if (viewerNumber=="3") this_viewer = viewer_3;
+    // getAllLabels is NOT present in 3Dmol by default, I added it manually
+    // console.log(this_viewer.getAllLabels());
+    var sel = this_viewer.selectedAtoms({predicate : select, byres : true }) ;
+    this_viewer.addResLabels(sel, { backgroundColor: 'darkgreen', backgroundOpacity: 0.8});
+    this_viewer.render();
+}
+
+
+function removeLabels(arg, name) {
+    var this_viewer;
+    if (arg==1) this_viewer = viewer;
+    if (arg==2) this_viewer = viewer_2;
+    if (arg==3) this_viewer = viewer_3;
+    if (name=='All') {
+        this_viewer.removeAllLabels();
+    }
+    else {
+        // Get labels again, this is redundant as this was already asked by the caller
+        // But it should be fast enough and is just easier
+        var labels = this_viewer.getAllLabels()
+        for (var i = 0; i < labels.length; i++) {
+            if (name == labels[i].text) {
+                this_viewer.removeLabel(labels[i]);
+            }
+        }
+    }
+    this_viewer.render();
+}
+
+$(document).ready( function() {
+    $("[rel=tooltip]").tooltip();
+    var chv = $('#menu option:selected').text();
+    $('#inpchains').val(chv);
+    $('#inpchainp').val(chv);
+    refresh_status();
+     setInterval(function () {
+         refresh_status();
+    },1000);
+    {% if info['status'] == 'done' %}
+        click_highest_model();
+        click_best_mutant();
+        dummy();
+    {% endif %}
+$.fn.dataTable.ext.search.push(
+    function( settings, data, dataIndex ) {
+        var min = parseInt( $('#min').val(), 10 );
+        var max = parseInt( $('#max').val(), 10 );
+        var age = parseInt( data[0] ) || 0; // use data for the age column
+ 
+        if ( ( isNaN( min ) && isNaN( max ) ) ||
+             ( isNaN( min ) && age <= max ) ||
+             ( min <= age   && isNaN( max ) ) ||
+             ( min <= age   && age <= max ) )
+        {
+            return true;
+        }
+        return false;
+    }
+);
+table =    $('#a3table').DataTable({"order": [],
+        "dom": '<<"cs"<"#sele"><"cs">><"#ran"><t>>',
+        "scrollY": "300",
+        "scrollCollapse": true,
+        "paging": false,
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            if (aData[3]>0.0) { $('td', nRow).addClass('warning');}
+//            if (Math.abs(aData[3])<1e-10) { $('td', nRow).addClass('hid'); }
+
+        },
+initComplete: function() {
+$('.hid').hide();
+var api = this.api();
+api.columns().indexes().flatten().each( function ( i ) {
+                var column = api.column(2);
+                var select = $('<select id="sec"><option value=""></option></select>')
+                
+                    .appendTo($("#sele").empty() )
+
+                    .on( 'change', function () {
+                        var val = $(this).val();
+ 
+                        column
+                            .search( val ? $(this).val() : val, true, false )
+                            .draw();
+                    } );
+ 
+                column.data().unique().sort().each( function ( d, j ) {
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                } );
+            } ); //flatten
+        
+        } // initConplete
+        
+        }); // dataTable()
+
+
+$("#sec").before(" <span class='cs'>Show chain </span>");
+$("#sec").after('<span class="cs">Show residues from <input id="min" name="min" pattern="\\d*" size=3 type="text"> to <input id="max" name="max" pattern="\\d*" size=3 type="text"></span>');
+$('#min, #max').keyup( function() { table.draw(); } );
+
+
+        $('.tomut').bind('click', function() { 
+            var resOne = $(this).data("ressk");
+            var resid = $(this).data("resid");
+            var resname = aa_dict_F[resOne];
+            var ressk = aa_dict[resOne];
+            var chain = $(this).data("chain");
+
+            var ress = $(this).data("ress");
+
+            $('#resfrom').html("<h2>From:</h2><h2 id='oldres' data-chain='"+chain+"' data-ressk='"+resOne+"' data-resname='"+ressk+"' data-resid='"+resid+"'>"+ressk+" <small>"+resname+"</small></h2><img class='img-thumbnail img-responsive' style='height:100%' src="+imgsrc.replace("G",resOne)+"><h6>residue index: "+resid+"</h6>");
+
+                $('#alercja').modal();
+        });
+}); // doc ready
+
+// setInterval(function() {
+//     var j_status =  "{{info['status']}}";
+//     if (j_status != "done" && j_status != "error")
+//             window.location.reload();
+//
+// }, 19000);
+</script>
+
+<script>
+
+//sprawdzanie przegladarki
+var ms_ie = false;
+var ua = window.navigator.userAgent;
+var old_ie = ua.indexOf('MSIE ');
+var new_ie = ua.indexOf('Trident/');
+
+{% if info['status'] == 'done' %}
+var margin = {top: 50, right: 20, bottom: 30, left: 50},
+width = 940 - margin.left - margin.right,
+height = 423 - margin.top - margin.bottom;
+var x = d3.scale.linear().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+
+var svg = d3.select("#chart")
+.append("svg")
+.style("display", "block")
+.style("width", "100%")
+.style("height", "100%")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom)
+.append("g")
+.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var line = d3.svg.line()
+.x(function(d) { return x(d.idx); })
+.y(function(d) { return y(d.score); });
+
+var menu = d3.select("#menu select")
+.on("change", change);    
+var _  = d3.select("#checkboxx").on("change",change);
+var dane0 =[];
+var dane1 =[];
+var bisectDate = d3.bisector(function(d) { return d.idx; }).left;
+
+
+d3.csv("{{url_for('compute_static_a3dtable',jobid=jid)}}", function(error, data) {
+	var dirty_iterator1 = {};
+	var dirty_iterator0 = {}; 
+	data.forEach(function(d) {
+		d.a3d = +d.score;
+			if (! ((isNaN(d.a3d)) || (d.a3d===0))){
+			d.res_idx = d.resi;
+			d.chain = d.ch;
+			d.res_name = d.resn;
+
+			if (d.ch in dirty_iterator1){
+				dirty_iterator1[d.ch]++;
+			} 
+			else{
+			dirty_iterator1[d.ch] = 0;
+			}
+			d.idx = dirty_iterator1[d.ch];
+			var wszystko = {idx: d.idx, res_idx: d.resi, chain: d.ch, res_name: d.resn, score: d.a3d};
+				dane1.push(wszystko);
+			}	
+			if (! (isNaN(d.a3d))){
+                        d.res_idx = d.resi;
+                        d.chain = d.ch;
+                        d.res_name = d.resn;
+
+                        if (d.ch in dirty_iterator0){
+                                dirty_iterator0[d.ch]++;
+                        } 
+                        else{
+                        dirty_iterator0[d.ch] = 0;
+                        }
+                        d.idx = dirty_iterator0[d.ch];
+                        var wszystko = {idx: d.idx, res_idx: d.resi, chain: d.ch, res_name: d.resn, score: d.a3d};
+                                dane0.push(wszystko);
+                        }       
+
+	});
+	redraw();
+});
+
+d3.select(window)
+.on("keydown", function() { altKey = d3.event.altKey; })
+.on("keyup", function() { altKey = false; });
+
+var altKey;
+var amac = aa_dict_F;
+
+function change() {
+    var chv = $('#menu option:selected').text();
+    $('#inpchains').val(chv);
+    $('#inpchainp').val(chv);
+    //console.log($('#menu option:selected').text())
+	clearTimeout(timeout);
+
+	d3.transition()
+	.duration(altKey ? 7500 : 1500)
+	.each(redraw);
+}
+
+
+function redraw() {
+
+	var b = $("#checkboxx").is(':checked');
+
+	if (b==1){
+	var nested = d3.nest()
+		.key(function(d) { return d.chain; })
+		.map(dane0)
+	}
+	if (b==0){
+	var nested = d3.nest()
+		.key(function(d) { return d.chain; })
+		.map(dane1)
+	}
+	
+	var series = menu.property("value");
+
+	var data = nested[series];
+	var keyring = ["score"];
+
+	var transpose = keyring.map(function(dips) {
+    		return {
+      			name: 'Chain '+series,
+      			values: data.map(function(d) {
+				return {score: d.score, idx: d.idx, resi: d.res_idx, resn: d.res_name};
+      			})
+    		};
+	});
+	
+	x.domain([
+	d3.min(transpose, function(c) { return d3.min(c.values, function(v) { return v.idx; }); }),
+	d3.max(transpose, function(c) { return d3.max(c.values, function(v) { return v.idx; }); })
+	]);
+	
+	y.domain([-5.5,5.5]);
+
+	var aresi =[];
+	var aresn =[];
+	var ascore =[];
+	var aidx =[];
+
+	for (var i in transpose[0].values){
+		var o  = transpose[0].values[i];
+		aresi.push(o.resi);
+		aresn.push(o.resn);
+		ascore.push(o.score);
+		aidx.push(o.idx);
+	};
+
+	var chain = svg.selectAll(".chain")
+	.data(transpose);
+	
+	var chainEnter = chain.enter().append("g")
+	.attr("class", "chain")
+	.attr("id", function(d) { return d.name; });
+
+	chainEnter.append("path")
+	.attr("d", function(d) { return line(d.values); })
+	.style("stroke", "steelblue")
+	.style("fill", "none")
+	.style("stroke-width", "2.5px");
+
+
+	chainEnter.append("text").attr("class","names");
+	var chainUpdate = d3.transition(chain);
+    
+    	chainUpdate.select("path")
+      	.attr("d", function(d) { return line(d.values); })
+        .style("stroke", "steelblue")
+        .style("fill", "none")
+        .style("stroke-width", "2.5px");    
+
+	var projname = "{{info['project_name']}}";
+        var titletxt = "Aggrescan3D profile | ";
+        if(projname.length<=60){
+                titletxt += projname;
+        }
+        else{
+                titletxt += projname.substr(0,57)+"...";        
+        }
+        titletxt += " | "+transpose[0].name;
+
+    	chainUpdate.select("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "14px") 
+        .style("font-color", "#777777")
+	.style("font-family","sans-serif")
+	.style("text-decoration", "none")  
+	.style("opacity","2")
+        .text(titletxt);
+
+
+	var grid = svg.append("svg:line")
+    	.attr("x1", 0)
+    	.attr("y1", height/2)
+    	.attr("x2", width)
+    	.attr("y2", height/2)
+    	.style("stroke", "lightgrey")	
+	.style("stroke-dasharray", ("5,5"))
+	.style("opacity", "2");
+
+	var xAxis = d3.svg.axis().scale(x)
+    	.orient("bottom")
+    	.tickFormat(function (d){ 
+		return aresn[d]+aresi[d];
+   	});
+    
+    	svg.append("svg:g")
+    	.attr("class", "x axis")
+  	.style("fill", "none")
+	.style("stroke", "#333333")
+	.style("stroke-width", "1px")
+	.style("shape-rendering", "crispEdges");
+
+
+    	var yAxis = d3.svg.axis().scale(y)
+    	.orient("left").tickValues([-4, -2, 0, 2, 4])
+
+    	svg.append("svg:g")
+    	.attr("class", "y axis")
+  	.style("fill", "none")
+	.style("stroke", "#333333")
+	.style("stroke-width", "1px")
+	.style("shape-rendering", "crispEdges");
+
+
+      	var osy = d3.transition(svg).select(".y.axis")
+        .call(yAxis);   
+        
+	osy.selectAll('text')
+	.style("fill", "#333333")
+        .style("stroke", "none")
+	.style("font-family","sans-serif")
+	.style("text-decoration", "none")
+	.style("font-size", "12px");
+  
+      	var osx = d3.transition(svg).select(".x.axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+	osx.selectAll('text')
+	.style("fill", "#333333")
+        .style("stroke", "none")
+	.style("font-family","sans-serif")
+	.style("text-decoration", "none")
+	.style("font-size", "12px");
+
+	svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("x", width)
+        .attr("y", height - 6)
+        .text("Residue")
+	.style("fill", "grey");
+
+	svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("y", 6)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90)")
+        .text("Score")
+	.style("fill", "grey");
+
+	var focus = svg.append("g")
+	.attr("class", "focus")
+	.style("display", null);
+	
+	svg.append("rect")
+	.style("fill", "none")
+	.style("pointer-events", "all")
+	.attr("width", width)
+	.attr("height", height)
+	.on("mouseover", function() { 
+                $("tbl_con").remove();
+		$(".focus").empty();
+        })
+	.on("mouseout", function() { 
+                $("tbl_con").remove();
+		$(".focus").empty();
+        })
+	.on("mousemove", mousemove);           
+
+	function mousemove() {
+                $("tbl_con").remove();
+		$(".focus").empty();
+
+		focus.selectAll("line").remove();
+
+		focus.append("circle")
+		.attr("r", 3.5)
+		.style("fill", "steelblue")
+		.style("stroke", "steelblue");
+
+		var x0 = x.invert(d3.mouse(this)[0]),
+	       	i = bisectDate(data, x0, 1),
+	        d0 = data[i - 1],
+	        d1 = data[i],
+	        d = x0 - d0.idx > d1.idx - x0 ? d1 : d0;
+		focus.attr("transform", "translate(" + x(d.idx) + "," + y(d.score) + ")");
+
+		var tabletxt = '<div id="tbl_con"><table class="mytablech">\
+   		<tr><th colspan="2">'+transpose[0].name+'</th></tr>';
+		if(d.score>0){
+			tabletxt+='<tr><td>Score</td><td style="color:red">'+d.score.toFixed(4)+'</td></tr>\
+			<tr><td>Residue index</td><td>'+d.res_idx+'</td></tr>\
+                	<tr><td>Residue name</td><td>'+amac[d.res_name]+'</td></tr>\
+			<tr><td style="text-align:center; background-color: #F2dede" colspan="2" class="danger">aggregation-prone residue</td></tr>\
+                	</table></div>';
+                } else if (d.score>-0.0000000001) {
+			tabletxt+='<tr><td>Score</td><td>'+d.score.toFixed(4)+'</td></tr>\
+			<tr><td>Residue index</td><td>'+d.res_idx+'</td></tr>\
+                	<tr><td>Residue name</td><td>'+amac[d.res_name]+'</td></tr>\
+			<tr><td style="text-align:center; background-color: gray" colspan="2">buried residue</td></tr>\
+                	</table></div>';
+                } else {
+			tabletxt+='<tr><td>Score</td><td>'+d.score.toFixed(4)+'</td></tr>\
+	                <tr><td>Residue index</td><td>'+d.res_idx+'</td></tr>\
+	                <tr><td>Residue name</td><td>'+amac[d.res_name]+'</td></tr>\
+			<tr><td style="text-align: center; background-color: #d9edf7" colspan="2">soluble residue</td></tr>\
+        	        </table></div>';
+
+		}
+
+		
+		if ((old_ie > -1) || (new_ie > -1)) {
+ 
+		var h=100;
+		var h1=18;
+		var h11=12;
+		var w=130;
+		var p1=10;
+		var p2=90;	      		
+
+		focus.append("svg:rect")
+		.attr("x",0)
+		.attr("y",h1)
+		.attr("width",w)
+		.attr("height",h1*3)
+		.style("fill","white");
+
+		focus.append("svg:rect")
+		.attr("x",0)
+		.attr("y",0)
+		.attr("width",w)
+		.attr("height",h1)
+		.style("fill","steelblue");
+		
+		for(i=0;i<6;i++){
+		focus.append("svg:line")
+		.style("stroke","grey")
+		.style("stroke-width","0.5")
+		.attr("x1",0)
+		.attr("y1",h1*i)
+		.attr("x2",w)
+		.attr("y2",h1*i);
+		}
+
+		focus.append("svg:line")
+		.style("stroke","grey")
+		.style("stroke-width","0.5")
+		.attr("x1",0)
+		.attr("y1",0)
+		.attr("x2",0)
+		.attr("y2",h1*5);
+
+		focus.append("svg:line")
+		.style("stroke","grey")
+		.style("stroke-width","0.5")
+		.attr("x1",w)
+		.attr("y1",0)
+		.attr("x2",w)
+		.attr("y2",h1*5);
+
+		focus.append("svg:line")
+		.style("stroke","grey")
+		.style("stroke-width","0.5")
+		.attr("x1",83)
+		.attr("y1",h1)
+		.attr("x2",83)
+		.attr("y2",h1*4)
+		.style("stroke-dasharray", ("2,2"));
+
+		focus.append("svg:text")
+        	.attr("x", 50)
+		.attr("y", h11)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","white")
+		.style("stroke","white")
+		.style("stroke-width","0.5")
+		.text(transpose[0].name);
+
+		focus.append("svg:text")
+		.attr("x",p1)
+		.attr("y", h11+h1)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","#333333")
+		.text("Score");
+		if(d.score>0){
+		focus.append("svg:text")
+		.attr("x",p2)
+		.attr("y", h11+h1)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","red")
+		.text(d.score.toFixed(4));
+	
+		focus.append("svg:rect")
+		.attr("x",0)
+		.attr("y",h1*4)
+		.attr("width",w)
+		.attr("height",h1)
+		.style("fill","#F2dede");		
+	
+		focus.append("svg:text")
+		.attr("x",9)
+		.attr("y", h11+h1*4)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","#333333")
+		.text("aggregation-prone  residue");
+		}
+
+                else if (d.score > -0.00001){
+                console.log("SDF");
+
+                    focus.append("svg:text")
+                    .attr("x",p2)
+                    .attr("y", h11+h1)
+                    .style("font-size","10px")
+                    .style("font-family", "sans-serif")
+                    .style("fill","#333333")
+                    .text(d.score.toFixed(4));
+                    
+                    focus.append("svg:rect")
+                    .attr("x",0)
+                    .attr("y",h1*4)
+                    .attr("width",w)
+                    .attr("height",h1)
+                    .style("fill","#d9edf7");		
+
+                    focus.append("svg:text")
+                    .attr("x",40)
+                    .attr("y", h11+h1*4)
+                    .style("font-size","10px")
+                    .style("font-family", "sans-serif")
+                    .style("fill","#333333")
+                    .text("buried residue");
+                }
+                else {
+                    focus.append("svg:text")
+                    .attr("x",p2)
+                    .attr("y", h11+h1)
+                    .style("font-size","10px")
+                    .style("font-family", "sans-serif")
+                    .style("fill","#333333")
+                    .text(d.score.toFixed(4));
+                    
+                    focus.append("svg:rect")
+                    .attr("x",0)
+                    .attr("y",h1*4)
+                    .attr("width",w)
+                    .attr("height",h1)
+                    .style("fill","#d9edf7");		
+
+                    focus.append("svg:text")
+                    .attr("x",40)
+                    .attr("y", h11+h1*4)
+                    .style("font-size","10px")
+                    .style("font-family", "sans-serif")
+                    .style("fill","#333333")
+                    .text("soluble residue");
+		}
+
+		focus.append("svg:text")
+		.attr("x",p1)
+		.attr("y", h11+h1*2)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","#333333")
+		.text("Residue index");
+	
+		focus.append("svg:text")
+		.attr("x",p2)
+		.attr("y", h11+h1*2)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","#333333")
+		.text(d.res_idx);
+	
+		focus.append("svg:text")
+		.attr("x",p1)
+		.attr("y", h11+h1*3)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","#333333")
+		.text("Residue name");
+
+		focus.append("svg:text")
+		.attr("x",p2)
+		.attr("y", h11+h1*3)
+		.style("font-size","10px")
+		.style("font-family", "sans-serif")
+		.style("fill","#333333")
+		.text(d.res_name);
+		
+		}		
+		
+		else {
+		 focus.append("foreignObject")
+	   	.attr("x", 0).attr("y", 0).attr("width", 310).attr("height", 110)
+	      	.append("xhtml:div")
+		.html(tabletxt);
+		}
+	}
+
+
+}
+var timeout = setTimeout(function() {
+  change();
+}, 2000);
+{% endif %}
+function conv(filetype) {
+    var serializer = new XMLSerializer();
+    var xmlString = serializer.serializeToString(d3.select('svg').node());
+    if (filetype=='svg') {
+        $('#svgdata').val(xmlString);
+        $('#svgform').submit();
+    } else {
+        $('#pngdata').val(xmlString);
+        $('#pngform').submit();
+    }
+}
+
+
+window.onclick = function(event) {
+  if (!event.target.matches('.btn-drop')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
+</script>
+
+{% endblock %}
+
+
+// This will be usefull for online server usgage - download version of model snapshots
+//
+// var pic_counter = 0;
+// var old_basename = '';
+// $("form#data").submit(function(e) {
+//     e.preventDefault();
+//     pic_counter++;
+//     var name = $( '#text' ).val() || "snapshot";
+//     console.log($( '#text' ).val());
+//     var basename = name.split("_")[0];
+//     if (old_basename == '') old_basename = basename;
+//     else {
+//         if (old_basename != basename) {
+//             pic_counter = 1;
+//             old_basename = basename;
+//         }
+//     }
+//     var new_name = basename+"_"+pic_counter;
+//     downloadURI(name+'.jpeg');
+//     $('#text').val(new_name);
+// });
+//
+// function downloadURI(filename) {
+//   var element = document.createElement('a');
+//   var pic_code = viewer_2.pngURI();
+//   element.setAttribute('href', decodeURIComponent(pic_code));
+//   element.setAttribute('download', filename);
+//
+//   element.style.display = 'none';
+//   document.body.appendChild(element);
+//
+//   element.click();
+//
+//   document.body.removeChild(element);
+// }

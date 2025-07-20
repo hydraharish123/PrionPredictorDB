@@ -1,0 +1,167 @@
+{% extends "index.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Which residues to exclude from the automatic mutation?</h2>
+            <p>
+            {% for k in sequence.keys() %}
+            <h3>Chain {{k}}</h3>
+                {% for row in sequence[k] %}
+                    <a href="#"><span class="badge" data-chain="{{k}}" data-ressk="{{row['resname']}}" data-resid="{{row['residx']}}" id="res{{k}}{{row['residx']}}">
+                            {{row['resname']}}
+                            <sub>{{row['residx']}}</sub>
+                    </span></a>
+                {% endfor %}
+            {% endfor %}
+
+            {% for row in sequence %}
+            {% endfor %}
+    </p>
+
+            <hr>
+            <div class="alert alert-warning">
+                <i class="fa fa-refresh"></i> Click on the residue symbol to prevent it from being mutated.
+            </div>
+        </div>
+        <div class="col-md-4" >
+            <div id="resinfo"></div>
+            <h3>Excluded residues</h3>
+                    <table id="mutTable" class="table table-hover table-condensed"> 
+                        <thead>
+                            <tr>
+                                <th>Residue</th>
+                                <th>Chain</th>
+                                <th>Index</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                        <h3>Additional options</h3>
+
+                    <form id="form" method="POST" action="{{url_for('up_automutation')}}">
+                        <input type="hidden" name="jid" value="{{jid}}">
+                     <table id="formTable" class="table table-hover table-condensed">
+                        <tbody>
+                            <tr>
+                                <td>Maximum number of mutated residues
+                                <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Residues for mutation will be selected based on their scores, the actual number might differ from the one selected here."><i class="fa fa-info-circle"></i></span>
+                                </td>
+                                <td><input type="number" name="n_mutated" value="2" min="1" max="10000" placeholder="Number of mutated residues" ></td>
+                            </tr>
+
+
+                            <tr>
+                                <td>
+                                Maximum number of cores used
+                                <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Number of mutants calculated simultaneously, it is recommended to select a number lower than the number of threads your CPU can run"><i class="fa fa-info-circle"></i></span>
+
+                                </td>
+                                <td>
+                                <input type="number" name="n_cores" value="2" min="1" max="100" placeholder="Number of cores used in simulation" >
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </form>
+                        <button onClick="validateForm()" class="btn btn-primary" ><i class="fa fa-floppy-o"></i> Save changes and submit</button>
+                        <a href="#" class="btn btn-danger" onClick="location.reload();"><i class="fa fa-rotate-left"></i> Undo</a>
+
+        </div>
+    </div>
+
+
+
+</div>
+
+<!-- Small modal -->
+
+<div class="modal fade" id="alercja" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="laba">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="laba">Mutate residue</h4>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-md-4" id="resfrom"></div>
+              <div class=col-md-8 id="resto">
+
+                  <h2>To:</h2>
+                  <div style="overflow-y:auto;height:200px">
+                    <div class="list-group" style="width:95%">
+                        {% for row in aa_dict %}
+                        <a data-dismiss="modal" onClick="keepResidue(this)" href="#" id="replace{{row[0]}}" data-ressk="{{row[2]}}" class="list-group-item" data-resname="{{row[0]}}">
+                            <h2><img class="img-thumbnail" width="100" src="{{url_for('static', filename='img/aa/'+row[2]+'.svg')}}"> {{row[0]}} <small>{{row[1]}}</small></h2> </a>
+                        {% endfor %}
+                    </div>
+                  </div>
+              </div>
+    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-undo"></i> Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %} 
+
+{%block below_js%}
+<script type="text/javascript" charset="utf-8">
+function keepResidue(v) {
+    var oldidx = $('#oldres').data("resid");
+    var chain = $('#oldres').data("chain");
+    var oldres = $('#oldres').data("resname");
+
+
+    var sspn = $("#res"+chain+oldidx);
+    sspn.css('background','#06cab6');
+    sspn.off('click');
+
+    var newRow = "<tr><td>"+oldres+"</td><td>"+chain+"</td><td>"+oldidx+"</td><td id='sub'"+oldidx+"' data-chain='"+chain+"' data-idx='"+oldidx+"'></td></tr>";
+    $('#mutTable > tbody > tr:last').before(newRow);
+    // hidden form
+    var inp_hid = jQuery('<input type=hidden name="toreplace[]" value="'+oldidx+chain+'">');
+    $('#form').append(inp_hid);
+
+
+
+}
+$(document).ready( function() {
+            var imgsrc = "{{url_for('static', filename='img/aa/G.svg')}}";
+            var aa_dict_F ={'A': 'alanine', 'R': 'arginine','N': 'asparagine','D': 'asparic acid','C': 'cysteine','E': 'glutamic acid', 'Q': 'glutamine','G': 'glycine','H': 'histidine','I': 'isoleucine','L': 'leucine','K': 'lysine', 'M': 'methionine','F': 'phenylalanine','P': 'proline','S': 'serine','T':'threonine','W': 'tryptophan', 'Y': 'tyrosine', 'V': 'valine', 'X': 'unknown'};
+            var aa_dict ={'A': 'ALA', 'R': 'ARG','N': 'ASN','D': 'ASP','C': 'CYS','E': 'GLU', 'Q': 'GLN','G': 'GLY','H': 'HIS','I': 'ILE','L': 'LEU','K': 'LYS', 'M': 'MET','F': 'PHE','P': 'PRO','S': 'SER','T':'THR','W': 'TRP', 'Y': 'TYR', 'V': 'VAL','X': 'UNK'};
+        $('.badge').bind('mouseenter', function() {
+            var resOne = $(this).data("ressk");
+            var resid = $(this).data("resid");
+            var resname = aa_dict_F[resOne];
+            var ressk = aa_dict[resOne];
+            var imgsrc = "{{url_for('static', filename='img/aa/G.svg')}}";
+
+            $('#resinfo').html("<div class='row'><div class='col-md-12 pull-right'><h2 class='pull-right'>"+ressk+" <small>"+resname+"</small></h2></div></div><div class='row'><div class='col-md-12'><div class='pull-right' style='width:300px'><img class='pull-right img-thumbnail' src="+imgsrc.replace("G",resOne)+"></div></div></div><div class='row'><div class='col-md-12'><h6 class='pull-right'>residue index: "+resid+"</h6></div></div>");
+        });
+
+        $('.badge').bind('click', function() {
+            var resOne = $(this).data("ressk");
+            var resid = $(this).data("resid");
+            var resname = aa_dict_F[resOne];
+            var ressk = aa_dict[resOne];
+            var chain = $(this).data("chain");
+            $('#resfrom').html("<h2>From:</h2><h2 id='oldres' data-chain='"+chain+"' data-ressk='"+resOne+"' data-resname='"+ressk+"' data-resid='"+resid+"'>"+ressk+" <small>"+resname+"</small></h2><img class='img-thumbnail' src="+imgsrc.replace("G",resOne)+"><h6>residue index: "+resid+"</h6>");
+            keepResidue(this);
+
+        });
+});
+
+function validateForm() {
+        $("#form").submit();
+}
+
+
+</script>
+{%endblock%}

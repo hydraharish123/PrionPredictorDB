@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ ! -e "/home/olek/agroscan/aggrescan3d/freesasa-2.0.1/bindings/python/data" ]; then
+    ln -s /home/olek/agroscan/aggrescan3d/freesasa-2.0.1/tests/data /home/olek/agroscan/aggrescan3d/freesasa-2.0.1/bindings/python/
+fi
+if [ ! -e "/home/olek/agroscan/aggrescan3d/freesasa-2.0.1/bindings/python/share" ]; then
+    ln -s /home/olek/agroscan/aggrescan3d/freesasa-2.0.1/share /home/olek/agroscan/aggrescan3d/freesasa-2.0.1/bindings/python/
+fi
+
+ python/test.py

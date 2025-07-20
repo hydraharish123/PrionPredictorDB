@@ -1,0 +1,39 @@
+.mytablech {
+#border-collapse:collapse;
+border-spacing:0;
+background-color:#fff;
+empty-cells:show;
+width:auto;
+#height:200px;
+#width:300px;
+#-webkit-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
+#-moz-box-shadow: 7px 7px 12px -9px rgb(119,119,119);
+#box-shadow: 7px 7px 12px -9px rgb(119,119,119);
+opacity: 1;
+}
+
+.mytablech tr {
+border:1px solid #CCC;
+}
+.mytablech th {
+background-color: steelblue;
+font-size:10px;
+padding:2px 5px;
+text-align:center;
+color:#FFF;
+#width:87px;
+}
+.mytablech td {
+font-size:10px;
+padding: 3px 6px;
+overflow:hidden;
+background-color:#fff;
+border-left:1px dotted #999;
+text-align: right;
+}
+
+
+
+
+
+

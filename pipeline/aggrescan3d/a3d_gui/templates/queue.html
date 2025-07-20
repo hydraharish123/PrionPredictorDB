@@ -1,0 +1,151 @@
+{% extends "index.html" %}
+{% block header %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/jasny-bootstrap.min.css')}}">
+
+{% endblock %}
+{% block indexuniq %} <title> Aggrescan3D: Project manager</title> {% endblock %}
+
+
+{% set page_n = page+1 %}
+{% set page_p = page-1 %}
+{% set displ_from = 1+(page-1)*config['PAGINATION'] %}
+{% set displ_to = (page)*config['PAGINATION'] if (page)*config['PAGINATION']<total_rows else total_rows %}
+
+{% block body %}
+
+
+
+<div class="container">
+    <div class="row" style="display: flex;align-items: center">
+        <div class="container col-lg-8">
+            <div class="panel panel-info">
+                <div class="panel panel-heading"><i class="fa fa-gears"></i> Add project</div>
+            <table class="table">
+                <form id="data" method="post" enctype="multipart/form-data">
+
+                <thead>
+                    <tr>
+                        <th>Add a project
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Select a config.ini file in a directory containing Aggrescan3D files."><i class="fa fa-question-circle"></i></span>
+                        </th>
+                        <th>Choose a project name
+                            <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Enter a name under which this job will be displayed here."><i class="fa fa-question-circle"></i></span>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>
+                                <input data-filename-placement="inside" class="btn-primary" name="file" type="file" id="file" />
+                    </td>
+                    <td>
+                        <input name="text" type="text" id="text" style="font-size:12pt" placeholder="Custom project name" />
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" value="Submit Button">Add project!</button>
+                    </td>
+
+                </tr>
+                </form>
+
+            </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel panel-heading"><i class="fa fa-reorder"></i> Your projects</div>
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Project name</th>
+                        <th>Status</th>
+                        <th>Start time</th>
+                    </tr>
+                </thead>
+                <tbody  data-link="row" class="rowlink">
+                {% for row in queue %}
+                <tr>
+                    <td class="col-md-8">
+                        <a href="{{url_for('job_status', jid=row['jid'])}}">
+                            {{row['project_name']}}
+                        </a>
+                    </td>
+                    <td class="col-md-2">
+                            {{row['status']|safe}}
+                    </td>
+                    <td class="col-md-2">
+                        <a href="{{url_for('job_status', jid=row['jid'])}}">
+                            {{row['date']}}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+                    <div id="lastPostsLoader"></div>
+            <div class="panel-body">
+    <ul class="pager">
+           {% if page_p<1: %}
+           <li class="previous disabled"><a href="#">&larr; Newer</a></li>
+           {% else %}
+               <li class="previous"><a href="{{url_for_other_page(page=page_p)}}">&larr; Newer</a></li>
+           {% endif %}
+           {% if (page_n-1)*config['PAGINATION']>total_rows: %}
+           <li class="next disabled"><a href="#">Older &rarr;</a></li>
+           {% else %}
+               <li class="next"><a href="{{url_for_other_page(page=page_n)}}">Older &rarr;</a></li>
+            {% endif %}
+            
+    </ul>
+            </div>
+            </div>
+
+
+
+
+</div>
+
+
+
+
+
+    </div>
+</div>
+{% endblock %}
+{%block below_js%}
+    <script src="{{url_for('static', filename='js/jasny-bootstrap.min.js')}}"></script>
+    <script>
+            setInterval(function() {
+                        window.location.reload();
+            }, 30000);
+
+$("form#data").submit(function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    formData.append('file',   $( '#file' )[0].files[0])
+    formData.append('text',   $( '#text' )[0])
+
+    $.ajax({
+        url: '{{url_for("add_job_to_db")}}',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function (response) {
+            window.location.replace(response)
+        },
+        error: function (error) {
+            alert(error.responseText);
+        },
+
+    });
+});
+    </script>
+{% endblock %}
+
+
+
+

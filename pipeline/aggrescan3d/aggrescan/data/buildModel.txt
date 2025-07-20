@@ -1,0 +1,3 @@
+pdb=input_Repair.pdb
+command=BuildModel
+mutant-file=individual_list.txt

@@ -1,0 +1,38 @@
+<h2>Aggrescan3D method</h2>
+<p class="text-justify">Aggrescan3D (<strong>A3D</strong>) is aimed to predict the aggregation propensities of proteins in their folded states. Towards this aim A3D uses as input protein 3D-structures, derived from X-ray diffraction, solution <span class="capital">nmr</span> or modelling approaches in <span class="capital">pdb</span> format. The structures are energetically minimized before their analysis. The method exploits an experimentally derived intrinsic aggregation propensity scale for natural amino acids (<a href="http://www.biomedcentral.com/1471-2105/8/65" target=_blank><i class="fa fa-link"></i> Conchillo-Sole, de Groot et al. 2007</a>) and projects this scale in the protein 3D structure. In the A3D method the intrinsic aggregation propensity of each particular amino acid in the structure is modulated by its specific structural context. Aggregation propensity is calculated for spherical regions centred on every residue C&alpha; carbon. This provides a unique structurally corrected aggregation value (A3D score) for each amino acid in the structure, which is formulated as: 
+
+<center>
+    <br> \(  A3D\  score = Agg_i × \left(α× e^{\beta × RSA_i} \right)+ \sum \left[Agg_e× \left(α× e^{\beta×RSA_e}\right) × \left(\gamma× e^{-\delta ×dist}\right) \right]    \)
+</center>
+<br>where: \(Agg_i\) is the instrinsic aggregation propensity of the residue in the centre of the sphere; \(RSA_i\) its relative surface area exposed to solvent;  \(Agg_e\) the instrinsic aggregation propensity of each additional residue included in the sphere, \(RSA_e\) its relative surface area exposed to solvent and \(dist\) its distance to the central residue \(i\).</p>
+<div class="row">
+    <div class="col-md-8">
+        <p class="text-justify">A3D discards the negligible contribution of highly hydrophobic residues hidden in the core of folded proteins to aggregation and focuses the prediction on protein surfaces. This structure-based approach identifies aggregation patches that are typically not contiguous in sequence like those identified by linear sequence or composition-based algorithms, outperforming them.</p>
+        <p class="text-justify">The identified aggregation prone residues or their surroundings can be virtually mutated to design variants with increased solubility. The selected mutation/mutations are modelled and a new A3D prediction is subsequently generated on top of this new structure <span class='small'>(see Figure below)</span>.</p>
+        <p class="text-justify">The dynamic structural fluctuations that a protein experiments in solution influence its aggregation propensity, promoting partial exposure of usually buried residues. In this way, mutations leading to destabilized protein variants with increased conformational fluctuations usually have a huge impact on the aggregation propensity of the protein. For this reason A3D can be also run in <strong>Dynamic Mode</strong>. In this mode, A3D exploits the <a href="http://biocomp.chem.uw.edu.pl/CABSflex/" target=_blank><i class="fa fa-link"></i> CABS-flex</a> approach for the fast simulations of near-native dynamics of globular proteins (<a href="http://nar.oxfordjournals.org/content/41/W1/W427" target=_blank><i class="fa fa-link"></i> Jamroz, Kolinski et al. 2013</a>). The aggregation properties of the ensemble of protein models are analysed and the most aggregation-prone conformer is selected as a proxy of the aggregation promoting state in the particular protein of interest (see Figure below).</p>
+
+    </div>
+    <div class="col-md-4">
+	<img src="{{url_for('static', filename='img/pipelineout.png')}}" class="img-thumbnail img-responsive">
+	<center>
+        <span class='small'><i>The A3D server pipeline</i></span> 
+        </center>
+    </div>
+
+</div>
+
+
+<hr>
+<h3>The Aggrescan3D standalone interface employs the following tools</h3>
+<ul>
+    <li>Aggrescan3D (aggregation propensity calculations based on 3D structures)</li>
+    <li>FreeSASA (accessible surface calculations)</li>
+    <li>Naccess (accessible surface calculations)</li>
+    <li>FoldX (modeling of mutations in protein structures)</li>
+    <li><i>Dynamic mode:</i> CABS-flex (simulations of protein structure fluctuations and accompanying analysis)</li>
+    <li>Pymol (protein visualization)</li>
+    <li>3Dmol (interactive protein visualization)</li>
+
+    
+</ul>
+<h6>Page created using Flask framework, twitter bootstrap styles, font-awesome jQuery, d3.js, bokeh, hyphenator, and dataTables JS.</h6>

@@ -1,0 +1,259 @@
+<h3>RESTful URI</h3>
+<p>Aggrescan3D webserver may be operated throught RESTful services, using following URIs:
+<ul>
+    <li><code>{{url_for('rest_submit_job', pdbcode='2pcy', _external=True)}}</code> submit new job (2pcy pdb entry)</li>
+    <li><code>{{url_for('rest_submit_userfile', _external=True)}}</code> submit user pdb file</li>
+    <li><code>{{url_for('rest_submit_job', pdbcode='2pcy', chain='A', _external=True)}}</code> submit new job (chain A of 2pcy pdb)
+        <ul>Optional json-formatted parameters:
+            <li><code>name</code> project name</li>
+            <li><code>email</code> email (info about job will be send to this email)</li>
+            <li><code>distance</code> (<code>"10"</code> or <code>"5"</code>) distance of aggregation</li>
+            <li><code>dynamic</code> (<code>"True"</code> or <code>"False"</code>) use dynamic mode</li>
+            <li><code>hide</code> (<code>"True"</code> or <code>"False"</code>) if True - do not show job on the queue page</li>
+            <li><code>mutate</code> - list of residues to mutate before A3D analysis. This option will be explained below.</li>
+        </ul>
+    </li>
+
+
+    <li><code>{{url_for('get_jobstatus', jobid='somejobidentifier', _external=True)}}</code> check job status</li>
+    <li><code>{{url_for('get_out_structure', jobid='somejobidentifier', _external=True)}}</code> get output structure with A3D values in the temperature factor column</li>
+    <li><code>{{url_for('get_job_info', jobid='somejobidentifier', _external=True)}}</code> get full information about submitted job (aggrescan3D values for individual residues, average A3D score, etc.)</li>
+    <li><code>{{url_for('a3d_avg', jobid='somejobidentifier', _external=True)}}</code> Get average A3D score</li>
+    <li><code>{{url_for('a3d_min', jobid='somejobidentifier', _external=True)}}</code> Get minimal A3D score</li>
+    <li><code>{{url_for('a3d_max', jobid='somejobidentifier', _external=True)}}</code> Get maximal A3D score</li>
+    <li><code>{{url_for('a3d_sum', jobid='somejobidentifier', _external=True)}}</code> Get total (sum) A3D score</li>
+    <li><code>{{url_for('a3d_gt0', jobid='somejobidentifier', _external=True)}}</code> Get residues with A3D score &gt; 0.0000</li>
+    </ul>
+
+<h3>Submitting job from the command line</h3>
+<p>Submit job for 2PCY protein, using cURL, with default parameters (i.e. distance of aggregation = 10Å, without mutation of residues, without distance mode, without hiding project on the queue page, without email address and with default project name):
+ <kbd>curl -i {{url_for('rest_submit_job', pdbcode='2pcy', _external=True)}}</kbd>. </p><p>Submit chain B of 1hui: 
+ <kbd>curl -i {{url_for('rest_submit_job', pdbcode='1hui', chain='B', _external=True)}}</kbd></p>
+
+<p>User should get output like:
+<pre>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 57
+Server: Werkzeug/0.9.6 Python/2.7.8
+Date: Wed, 12 Nov 2014 13:52:56 GMT
+
+{
+  "jobid": "a0ae2bb71feeaf0",
+  "status": "submitted"
+}
+</pre>
+
+where <code>jobid</code> is job identifier assigned to the just submitted job. Otherwise (for example if pdbcode doesn't exists or input data doesn't fullfill requirements), user should get output similar to:
+<pre>
+HTTP/1.0 404 NOT FOUND
+Content-Type: text/html; charset=utf-8
+Content-Length: 5521
+Server: Werkzeug/0.9.6 Python/2.7.8
+Date: Wed, 12 Nov 2014 13:56:48 GMT
+
+  
+&lt;!doctype html&gt;
+&lt;html lang='en'&gt;
+[...]
+</pre>
+</p>
+
+<p>To override default parameters, user may post additional options, i.e.: <kbd>
+    curl -i -X POST -d '{"email": "john@doe.com", "dynamic": "True", "name": "some project name"}' -H 'Content-Type: application/json' {{url_for('rest_submit_job', pdbcode='2pcy', _external=True)}}</kbd>. Specified parameters will override default parameters, not specified ones would left unchanged (in this example job will be submitted with distance of aggregation = 10Å, with dynamic mode, and with specified email and project name).</p>
+
+<h2>Submitting from the python script</h2>
+<p>The simplest Python script for submitting new job may looks like:
+<pre>
+#!/usr/bin/env python
+import requests
+
+req = requests.post('{{url_for('rest_submit_job', pdbcode='2pcy', _external=True)}}')
+
+print(req.status_code)
+print(req.json())
+</pre></p>
+<p>Submitting with parameters (<strong>mutation</strong>) from Python script:
+<pre>
+#!/usr/bin/env python
+import requests
+import json
+
+# define which residues to mutate. If specified residues not exists within pdb
+# job will not be submitted (got 404 error)
+mutation_table = [{'idx': "1", 'chain': 'A', 'oldres': 'I', 'newres': 'W'},
+                  {'idx': "2", 'chain': 'A', 'oldres': 'D', 'newres': 'W'}]
+
+# specify additional options
+options = {'dynamic': True,
+           'distance': 5,
+           'email': 'john@doe.gov',
+           'name': 'some project name',
+           'hide': True,
+           'mutate': mutation_table}
+
+req = requests.post('{{url_for('rest_submit_job', pdbcode='2pcy', _external=True)}}',
+                    data=json.dumps(options),
+                    headers={'content-type': 'application/json'})
+
+print(req.status_code) # get HTTP code. If 200 = OK. Otherwise = problems
+print(req.json()) # get query returned data
+</pre>
+
+
+
+<h2>Submitting custom PDB file from the python script</h2>
+<p>The simplest Python script for submitting new job may looks like:
+<pre>
+#!/usr/bin/env python
+import requests
+
+req = requests.post('{{url_for('rest_submit_userfile', _external=True)}}', files={'inputfile': open('some_file.pdb', 'rb')})
+
+print(req.status_code)
+</pre></p>
+<p>Submitting user file with parameters (<strong>mutation</strong>) from Python script:
+<pre>
+#!/usr/bin/env python
+import requests
+import json
+
+# define which residues to mutate. If specified residues not exists within pdb
+# job will not be submitted (got 404 error)
+mutation_table = [{'idx': "1", 'chain': 'A', 'oldres': 'I', 'newres': 'W'},
+                  {'idx': "2", 'chain': 'A', 'oldres': 'D', 'newres': 'W'}]
+
+# specify additional options
+options = {'dynamic': True,
+           'distance': 5,
+           'email': 'john@doe.gov',
+           'name': 'some project name',
+           'hide': True,
+           'mutate': mutation_table}
+
+req = requests.post('{{url_for('rest_submit_userfile', _external=True)}}', data=options, files={'inputfile': open('some_file.pdb', 'rb')})
+
+print(req.status_code) # get HTTP code. If 200 = OK. Otherwise = problems
+</pre>
+
+
+
+
+<h2>Get submitted job information</h2>
+<p>By running 
+<kbd>curl -i {{url_for('get_jobstatus', jobid='somejobidentifier', _external=True)}}</kbd>
+user should get:
+<pre>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 19
+Server: Werkzeug/0.9.6 Python/2.7.8
+Date: Wed, 12 Nov 2014 14:27:49 GMT
+
+{
+  "done": false
+}
+</pre>
+if job is running/pending, or
+<pre>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 18
+Server: Werkzeug/0.9.6 Python/2.7.8
+Date: Wed, 12 Nov 2014 14:28:33 GMT
+
+{
+  "done": true
+}
+</pre>
+if job got done/error status.</p>
+<p>To get protein structure with A3D values in the temperature factor column and save it to <code>out</code> file:
+<kbd>curl -o out {{url_for('get_out_structure', jobid='somejobidentifier', _external=True)}}</kbd></p>
+<p>To get full information about submitted job, user may create Python script like:
+<pre>
+#!/usr/bin/env python
+import requests
+
+req = requests.get('{{url_for('get_job_info', jobid='somejobidentifier', _external=True)}}')
+
+print(req.status_code)
+data = req.json()
+for k in data.keys():
+    print("key: %s: %s" % (k, data[k]))
+</pre>
+getting output similar to:
+<pre>
+200
+key: chain_sequence: A: GSFTMPGLVDSNPAPPESQEKKPLKPCCACPETKKARDACIIEKGEEHCGHLIEAHKECMRALGFKI
+key: status: done
+key: mutated_residues: None
+key: dynamic_mode: 0
+key: mutate_mode: 0
+key: last_status_change_date: 2014-11-06 12:01:04
+key: project_name: b530f472611c285
+key: aggregation_distance: 10
+key: aggrescan3Dscore: {u'max_value': 1.664, u'total_value': -95.41120000000001, u'min_value': -4.1893, u'average_value': -1.424, u'table': [{u'res_name': u'G', u'res_idx': u'1', u'chain': u'A', u'a3d': u'-0.3367'}, ...  ]}
+key: submission_date: 2014-11-06 11:53:12
+</pre>
+If user would like to get Aggrescan3D score table, she may use script like:
+<pre>
+#!/usr/bin/env python
+import requests
+
+req = requests.get('{{url_for('get_job_info', jobid='somejobidentifier', _external=True)}}')
+
+data = req.json()
+a3d = data['aggrescan3Dscore']
+
+print("AVG A3D: %s" % (a3d['average_value'])) # data is a dictionary
+print("MIN A3D: %s" % (a3d['min_value']))
+
+for row in a3d['table'][:6]:
+    print(row['res_idx'], row['a3d'])
+</pre>
+to get output like:
+<pre>
+AVG A3D: -1.424
+MIN A3D: -4.1893
+(u'1', u'-0.3367')
+(u'2', u'0.3541')
+(u'3', u'1.6640')
+(u'4', u'0.8468')
+(u'5', u'1.2976')
+(u'6', u'0.5633')
+</pre>
+</p>
+<p>Combine two RESTful URI to wait until job is done:
+<pre>
+#!/usr/bin/env python
+import requests
+import time
+
+server = '{{url_for('index_page', _external=True)}}RESTful/job/'
+jobid = "caaaffa24b4bcad"
+
+v = False
+while not v:
+    req = requests.get(server+jobid+'/isdone/')
+    v = req.json()['done']
+    time.sleep(60)  # 1 min intervals
+
+req = requests.get(server+jobid)
+data = req.json()
+a3d = data['aggrescan3Dscore']
+print("AVG A3D: %s" % (a3d['average_value']))
+</pre>
+Above script will print average A3D score as soon as job get 'done' status.
+</p>
+<p>Some fun with RESTful and Bash scripting. Script below should say something as soon as job is completed:
+<pre>
+#!/usr/bin/env bash
+
+v="false"
+while [ "$v" == "false" ]
+do
+    v=`curl -s {{url_for('get_jobstatus', jobid='somejobidentifier', _external=True)}} | grep 'done' |grep -o 'false'`
+    sleep 6
+done
+mplayer -user-agent Mozilla  "http://translate.google.com/translate_tts?q=Job+completed.Aggrescan+3D+is+wonderful&tl=en"
+</pre>

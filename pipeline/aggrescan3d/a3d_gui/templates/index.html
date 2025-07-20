@@ -1,0 +1,269 @@
+{% from 'macros.html' import render_field %} {% from 'macros.html' import render_checkbox_field %} {% from 'macros.html' import render_radio_field %}
+<!doctype html>
+<html lang='en'>
+<head>
+<link rel="icon" type="image/png" href="{{url_for('static',filename='img/favicon.png')}}" />
+<meta charset="utf-8">
+<meta name="description" content="server for prediction of aggregation propensity in protein structures and rational design of protein solubility. In dynamic mode, A3D takes into account the flexibility of natural and designed polypeptides. " />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% block indexuniq %} <title> Aggrescan3D </title> {% endblock %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/font-awesome.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap-theme.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/my_custom.css')}}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<![endif]-->
+    {% block header %}
+    {% endblock %}
+</head>
+
+
+<body data-spy="scroll" data-target="#affix-nav">
+
+<!-- Fixed navbar -->
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+  <div class="container">
+      <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <a class="navbar-brand" href="{{url_for('index_page')}}"> <img width=28 class="img-thumbnail" src={{url_for('static',filename='img/A3D.svg')}}></a>
+      <a class="navbar-brand" href="{{url_for('index_page')}}"> Aggrescan3D </a>
+    </div>
+    <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-left">
+              <li><a href="{{url_for('queue_page')}}"><i class="fa fa-reorder"></i> Project manager</a></li>
+              <li><a href="{{url_for('index_page')}}"><i class="fa fa-gears "></i> Start a new job</a></li>
+    </ul>
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="{{url_for('learn_more')}}"><i class="fa fa-cube"></i> About</a></li>
+              <!--<li><a href="{{url_for('tutorial')}}"><i class="fa fa-question-circle"></i> Tutorial</a></li>-->
+              <li><a href="{{url_for('index_contact')}}"><i class="fa fa-envelope-o"></i> Contact</a></li>
+            <form method="GET" action="{{url_for('queue_page')}}" class="navbar-form navbar-right" role="search">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="project name search" name="q" id="q"> 
+                </div>
+            </form>
+          </ul>
+
+    </div><!--/.nav-collapse -->
+  </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            	{% with infos = get_flashed_messages() %}
+            		{% if infos %}
+						{% for message in infos %}
+                        <div class="alert alert-danger alert-dismissable">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<i class="fa fa-warning"></i>
+							{{ message.decode('utf-8')|safe }}
+                        </div>
+						{% endfor %}
+            		{% endif %}
+            	{% endwith %}
+        </div>
+    </div>
+</div>
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-7 hidden-xs" id="main_panel">
+            <div class="jumbotron ">
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <img class="img-responsive" style="height:150px;margin-top:80px" src={{url_for('static',filename='img/A3D.svg')}}>
+                    </div>
+                    <div class="col-md-8 hyphenate">
+                        <h2>Aggrescan3D (<strong>A3D</strong>)<small>
+                                <br>
+                            Welcome to the Aggrescan3D standalone app.
+                            Please take a few minutes to read the tutorial before using the app for the first time.
+
+                            </small></h2>
+                        <p><a href="https://bitbucket.org/lcbio/aggrescan3d/wiki/Home" class="btn btn-primary btn-lg" role="button">Learn more »</a></p>
+                    </div>
+                </div>
+            </div>
+
+                <div class="panel panel-default hidden-xs">
+                     <table class="table" style="padding:15px">
+                       <tr>
+			<td><br> <i class="fa fa-warning fa-4x" style="color:#ff0000"></i> </td>
+
+                         <td class='hyphenate' style="padding:5px">
+                         <p style="color:#ff0000"><strong>News on Aggrescan3D development:</strong></p>
+                           <ul>
+                 <li class="tabtxt">Automated mutations are here! Analyze potential mutations on your proteins with just a few clicks.
+                 Read more <a href="https://bitbucket.org/lcbio/aggrescan3d/wiki/Home#markdown-header-11-automated-mutation-workflow"> on our wiki.</a></li>
+			     <li class="tabtxt">Dynamic mode of Aggrescan3D has been extended to support multichain proteins and proteins longer than 400 AA </li>
+		             <li class="tabtxt">The standalone app is now in testing phase. Please report any bugs or issues on our
+                         <a href="https://bitbucket.org/lcbio/aggrescan3d/issues?status=new&status=open"> bitbucket repository</a></li>
+                           </ul>
+                         </td>
+                      </tr>
+                    <tr><td width=10% style="padding:15px"> <br>
+			<i class="fa fa-file-text fa-4x" style="color:#4169e1"></i>
+                    </td>
+                     <td class='hyphenate' style="padding:5px">
+                     <p style="color:#4169e1"><strong>  Papers describing Aggrescan3D server and its example applications:</strong> </p>
+                       <ul><li>
+ <a href="https://academic.oup.com/nar/article/43/W1/W306/2467885 ">
+     AGGRESCAN3D (A3D): server for prediction of aggregation properties of protein structures</a>,
+ <i><small>Nucleic Acids Research, 43, W306-W313, 2015 </small> </i>
+                            </li><li>
+ <a href="https://pubs.acs.org/doi/10.1021/acs.molpharmaceut.8b00341">
+    Combining Structural Aggregation Propensity and Stability Predictions To Redesign Protein Solubility</a>,
+<i><small>Molecular Pharmaceutics, 10.1021/acs.molpharmaceut.8b00341, 2018</small></i>
+                                </li>
+
+                            </ul>
+                        </td>
+                    </tr>
+
+
+                </table>
+            </div>
+
+        </div>
+        <div class="col-md-5">
+
+
+                <div class="panel panel-default ">
+                    <div class="panel-body">
+                        <form  class="form-horizontal" id="form" role="form" enctype="multipart/form-data" method="POST" action="{{url_for('index_page')}}">
+       
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    Input structure
+                                </div>
+                                <div class="panel-body">
+
+                                    <div class="row">
+                                        <div class="col-xs-5"> <label> PDB code</label> </div>
+                                        <div class="col-xs-2"> or </div>
+                                        <div class="col-xs-5">
+                                        <label> Local PDB file</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-5 {% if form.input_pdb_code.errors %}has-error{% endif %}">
+                                                {{ form.input_pdb_code(class_='form-control', placeholder=form.input_pdb_code.description) }}
+                                            
+
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-5">
+                                        <input data-filename-placement="inside" class="btn-primary" type=file title="Browse" id="{{ form.input_file.id }}" name="{{ form.input_file.id }}">
+
+                                        </div>
+                                    </div>
+                <div class="row">
+
+                    <div class="col-xs-12">
+                        <div class="form-group ">
+                            <label><p style="padding-left: 15px; padding-top: 10px"> Chain </p></label>
+                             <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Select one chain that will be used in the simulation"><i class="fa fa-info-circle"></i></span>
+                            <p style="padding-right: 30px; padding-left: 15px" >  <input type="text" class="form-control" id="{{ form.chain.id }}" name="{{ form.chain.id }}" placeholder="A" value="{{ form.chain.data }}"></p>
+                        </div>
+                    </div>
+
+                </div>
+                            </div>
+                        </div>
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading"> Options </div>
+      <div class="panel-body">
+        {{render_field(form.name, help='This name will be displayed on the queue page', placeholder=form.name.description)}}
+        {{render_radio_field(form.foldx, help='FoldX is used to optimize input structure. If you have already optimized it unlclick this option to speed up the calculation. FoldX is <strong>required</strong> for mutation calculation')}}
+
+        {{render_radio_field(form.dynamic, help='If <strong>Yes</strong>, A3D will take into account the flexibility of an input structure. If <strong>No</strong>, A3D will perform analysis on a static input structure.')}}
+        {{render_radio_field(form.mutation, help='Mutate your input protein, mutation options will be provided in the next step.')}}
+        {{render_radio_field(form.distance, help='Select the radius (R) of the sphere used in the analysis')}}
+        {{render_radio_field(form.auto_mutation, help='Automatically select mutation targets and mutate them into several amino acids..')}}
+        {{render_field(form.ph, help='Warning! This option is still under development and testing! Use a pH dependant A3D scale. Accepts values from 0.001 to 14.', placeholder='0.01-14')}}
+        {{form.jid}}
+        {{form.csrf_token()}}
+
+      <button type="submit" class="btn btn-lg btn-block btn-primary" value="Submit"><i class="fa fa-gears "></i> Run </button>
+                </div>
+
+              </div>
+            </form>
+                        <!--TODO Fix the looks of this panel-->
+        <form class="form-horizontal" role="form" id="foldx" method="POST" enctype="multipart/form-data">
+            <div class="panel panel-default">
+                <div class="panel-heading"> FoldX settings </div>
+                  <div class="panel-body">
+                        <b>Change your foldx path:</b>
+              <span data-toggle="tooltip" rel='tooltip' data-placement="right" title="Enter a path to your FoldX folder. Absolute path would look like: /home/user/FoldX"><i class="fa fa-question-circle"></i></span>
+                      <input name="text" type="text" id="text" style="font-size:14pt" placeholder="{{foldx_path}}" />
+                        <button class="btn btn-primary" value="Submit Button">Change location</button>
+                </div>
+            </div>
+        </form>
+        </div>
+
+        </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+<div class="container">
+    <hr><small class="text-muted" style="float:right">Laboratory of Theory of Biopolymers 2018</small>
+</div>
+{%block jsdata %}
+<script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+<script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/hyp.js')}}"></script>
+{%endblock %}
+
+{%block below_js%}
+<script src="{{url_for('static', filename='js/bootstrap.file-input.js')}}"></script>
+<script src="{{url_for('static', filename='js/jasny-bootstrap.min.js')}}"></script>
+
+<script type="text/javascript" charset="utf-8">
+$('input[type=file]').bootstrapFileInput();
+$(document).ready( function() {
+    $("[rel=tooltip]").tooltip({'html':'true'});
+});
+</script>
+
+<script>
+$("form#foldx").submit(function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    formData.append('text',   $( '#text' )[0])
+    $.ajax({
+        url: '{{url_for("change_foldx_path")}}',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function (response) {
+            alert("Location changed to: " + response);
+        },
+        error: function (error) {
+            alert(error.responseText);
+        },
+
+    });
+});
+</script>
+{%endblock%}
+
+</body>
+</html>

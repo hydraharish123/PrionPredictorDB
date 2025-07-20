@@ -1,0 +1,213 @@
+
+<div class="panel-group" id="accordion">
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseMinus3">
+	How to submit the job
+        </a>
+      </h4>
+    </div>
+    <div id="collapseMinus3" class="panel-collapse collapse">
+      <div class="panel-body">
+<p class="text-justify">In order to submit the job you need to provide:
+	<ul>
+		<li>the input structure in the form of <span class="capital">pdb</span> structure code or protein structure file (in <span class="capital">pdb</span> format). It can correspond both to an experimentally determined structure or a protein model. However, A3D does not process Cα only structures,</li>
+		<li>optionally, the project name,</li>
+		<li>optionally, introduce your email if you want to receive notifications at both the beginning and end of your prediction.</li>
+	</ul>
+</p>
+<p class="text-justify">Mark the option "<strong>Do not show my job on the queue page</strong> if you don't want the job to be visible to anyone else on the <a href="{{url_for('queue_page')}}" target=_blank><i class="fa fa-link"></i> queue page</a>.</p>
+<p class="text-justify">The example of submitting the job named <i>example_2D4F</i> by providing the <span class="capital">pdb</span> code <i>2D4F</i> is displayed below:</p>
+<br/>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D1out.png')}}" class="img-thumbnail img-responsive">
+</center>
+<br/><br/>	
+<p class="text-justify">The example output of the job is provided <a href="{{url_for('job_status', jid=config['EXAMPLE_JOB'])}}" target=_blank><i class="fa fa-link"></i> here</a>.</p>
+<h3>Optional parameters:</h3>	
+<h4><span class="label label-primary">Dynamic mode</span></h4>
+<p class="text-justify">You can select to perform your predictions in <strong>Static mode</strong> (default) or <strong>Dynamic mode</strong>. In Dynamic mode A3D will take into account the flexibility of your input structure in the prediction. It should contain a single chain without breaks and no more than 400 residues. 
+<br>The example output of the job, that was run in the dynamic mode, is provided <a href="{{url_for('job_status', jid=config['EXAMPLE_JOB2'])}}" target=_blank><i class="fa fa-link"></i> here</a>.</p>
+<p class="text-justify"><strong>Dynamic mode</strong> requires input <span class='capital'>pdb</span> files with continuous (without breaks) protein chain. <span class='capital'>pdb</span> files with gaps in structure have to be first prepared by filling up the missing fragment.</p>
+<h6>
+<p class="text-justify">Below is the list of example software and on-line servers that enable filling in the gaps in incomplete 3D models:</p>
+	<ul>
+		<li><strong>Modeller software</strong></li>
+		<p class="text-justify">use Modeller to 'fill in' these missing residues by treating the original structure (without the missing residues) as a template, and building a comparative model using the full sequence
+		<br/>
+		Availability: <a href="http://salilab.org/modeller/wiki/Missing%20residues" target=_blank><i class="fa fa-link"></i> http://salilab.org/modeller/wiki/Missing%20residues</a></p>
+		<li><strong>Modloop server</strong></li>
+		<p class="text-justify">The server relies on the loop modeling routine in MODELLER that predicts the loop conformations by satisfaction of spatial restraints, without relying on a database of known protein structures 
+		<br/>
+		Availability: <a href="http://modbase.compbio.ucsf.edu/modloop/" target=_blank><i class="fa fa-link"></i> http://modbase.compbio.ucsf.edu/modloop/</a></p>
+		<li><strong>I-TASSER server</strong> </li>
+		<p class="text-justify">use with "Option I: Assign additional restraints and templates to guide I-TASSER modeling." You can use a <span class='capital'>pdb</span> file with a missing fragment as a template and provide a missing fragment sequence in an alignment file 
+		<br/>
+		Availability: <a href="http://zhanglab.ccmb.med.umich.edu/I-TASSER/" target=_blank><i class="fa fa-link"></i> http://zhanglab.ccmb.med.umich.edu/I-TASSER/</a></p>
+		<li><strong>FALC-loop server</strong></li>
+		<p class="text-justify">Users can submit a protein structure with one or more missing parts (called loops) through the Submit page and view and download the constructed loop models on the Queue page. 
+		<br/>
+		Availability: <a href="http://falc-loop.seoklab.org/" target=_blank><i class="fa fa-link"></i> http://falc-loop.seoklab.org/</a></p>
+		<li><strong>FREAD server</strong></li>
+		<p class="text-justify">FREAD is a database search loop modelling algorithm. Its primary use is to fill in the gaps in incomplete 3D models of protein structures 
+		<br/>
+		Availability: <a href="http://opig.stats.ox.ac.uk/webapps/fread" target=_blank><i class="fa fa-link"></i> http://opig.stats.ox.ac.uk/webapps/fread</a></p>
+		<li><strong>Commercial software</strong> </li>
+		<p class="text-justify">One can use also commercially available programs for loop sampling like Prime, ICM, and Sybyl (see <a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2206982/" target=_blank><i class="fa fa-link"></i> comparison</a> of these programs).</p>
+	</ul>
+</p>
+</h6>
+<h4><span class="label label-primary">Mutate residues</span></h4>
+<p class="text-justify">You can select to mutate one or more residues in your input structure. If you select <strong>Mutate residues</strong> upon pressing the submit button you will be directed to the “Which residues to mutate?” tab in which you can select the mutations for each desired residue and chain. The selected original and replaced residues, the position and the chain will be displayed. Save changes and submit. Mutations can also be performed previously after running a first analysis on wild type structures.</p>
+
+<h4><span class="label label-primary">Distance of aggregation analysis</span></h4>
+<p class="text-justify">A3D can be used at two resolutions: use R = 10 Å (default) for identifying residues involved in the formation of aggregation-prone patches and R = 5 Å for a dissection of the contribution individual residues to these patches.	
+</p>
+
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseMinus2">
+	Project status
+        </a>
+      </h4>
+    </div>
+    <div id="collapseMinus2" class="panel-collapse collapse">
+      <div class="panel-body">
+
+<p class="text-justify">After clicking the Submit button, will appear info about your project details and status. 
+If you have chosen <strong>Do not show my job on the queue page</strong> it is important to bookmark the page to check results - otherwise your job will be accessible from the <a href="{{url_for('queue_page')}}" target=_blank><i class="fa fa-link"></i> queue page</a>.</p>
+<p class="text-justify">The job status information will start from the <span class="label label-warning"><i class="fa fa-spinner fa-spin"></i> pending</span> status, which is state when webserver waits for computational server to fetch the job input data:</p> 	
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D2out.png')}}" class="img-thumbnail img-responsive">	
+</center>
+<br>
+<p class="text-justify">Just before computing, job status changes to <span class="label label-primary"><i class="fa fa-bolt"></i> running</span> status.
+The jobs ends with the <span class="label label-success"><i class="fa fa-check-circle-o"></i> done</span> status (or <span class="label label-danger"><i class="fa fa-exclamation-circle"></i> error</span> status, if something went wrong <small>admins will get email from the server about error job and will try to fix it</small>):</p> 
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D4out.png')}}" class="img-thumbnail img-responsive">	
+</center>
+</p>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseMinus1">
+        How to access and interpret the results data
+        </a>
+      </h4>
+    </div>
+    <div id="collapseMinus1" class="panel-collapse collapse">
+      <div class="panel-body">
+<p class="text-justify">
+<h4><span class="label label-primary"><i class="fa fa-table"></i> Aggrescan3D score</span></h4>
+<p class="text-justify">Under the <strong>Aggrescan3D score</strong> tab the following data are provided:</p>
+                    <dl class="dl-horizontal">
+                        <dt>
+                            Minimal score value
+                        </dt>
+                        <dd>
+        Value of the most soluble residue in the structural context.
+                        </dd>
+
+                        <dt>
+                   Maximal score value 
+
+                        </dt>
+                        <dd>
+Value of the most aggregation-prone residue in the structural context.
+                        </dd>
+
+                        <dt>
+Average score
+                        </dt>
+                        <dd>
+        A normalized indicator of the aggregation propensity/solubility of the protein structure. Allows comparing the solubility of different protein structures.It also allows assessing changes in solubility promoted by amino acid substitutions in a particular protein structure. The more negative the value, the highest the normalized solubility.
+                    
+                        </dd>
+                        <dt>
+Total score
+                        </dt>
+                        <dd>
+        A global indicator of the aggregation propensity/solubility of the protein structure. It depends on the protein size. It allows assessing changes in solubility promoted by amino acid substitutions in a particular protein structure. The more negative the value, the highest the global solubility.
+                    
+                        </dd>
+                    </dl>
+
+<p class="text-justify">These values are provided for each polypeptide chain in the structure.  A particular protein region in the chain can also be individually analysed.</p>
+<p class="text-justify">The Aggrescan3D score tab includes a scrolling list in which <strong>residue index, residue name, chain and Aggrescan3D score</strong> for all exposed residues in the structure. Residues with positive scores, i.e. aggregation-prone, are highlighted in yellow. The list can be downloaded (<button class="btn btn-primary btn-xs"><i class="fa fa-download"></i> Download table <span class="caret"></span></button> button) as a <span class='capital'>csv</span> or <span class='capital'>txt</span> tabular data.</p>
+<br/>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D6out.png')}}" class="img-thumbnail img-responsive">
+</center>
+<br/>
+<br/>
+<p class="text-justify">Each single residue in the list can be mutated to any of the other 19 amino acids using the <button class="btn btn-success btn-xs">mutate</button> button. 
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D7out.png')}}" class="img-thumbnail img-responsive">	
+</center>
+<br/>
+Once selected all the required mutations (mark of mutation from Y to A on chain A and residue 26: <label class="label label-warning">mutate: YA26A</label>), a new project is generated by pressing the
+<button class="btn btn-success btn-xs"><i class="fa fa-gears"></i> submit</button> 
+button.</p>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D8out.png')}}" class="img-thumbnail img-responsive">	
+</center>
+<br/>
+<hr>
+
+<h4><span class="label label-primary"><i class="fa fa-line-chart"></i> Aggrescan3D plot</span></h4>
+<p class="text-justify">Under the <strong>Aggrescan3D plot</strong> tab the results are accessible as a line plot corresponding to the aggregation profile of the polypeptide chain. Y axis corresponds to A3D score values. Residues with positive scores in the analysed structure, therefore predicted as aggregation-prone, are indicated on top of the profile. The plot can be downloaded in <span class='capital'>svg</span> format.</p>
+<br/>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3Dwykresout.png')}}" class="img-thumbnail img-responsive">
+</center>
+<br/>
+<p class="text-justify">If the input structure consists of more than one chain, each chain plot can be displayed by selecting the chain signature (A, B, etc.) from the drop-down list.</p>
+<br/>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3Dshow2out.png')}}" class="img-thumbnail img-responsive">
+</center>
+<br/>
+<hr>
+
+<h4><span class="label label-primary"><i class="fa fa-flask"></i> Structure</span></h4>
+<p class="text-justify">Under the <strong>Structure</strong> tab a video of the protein structure is automatically generated by creating frames from pictures of the structure in different rotation states, with residues coloured according to their <strong>Aggrescan3D score</strong>. Areas with high-predicted aggregation propensity are labelled according to a red gradient and areas with high-predicted solubility according to a blue gradient. White areas are not predicted to influence aggregation (<strong>A3D score</strong> equal to zero).</p>
+<br/>	
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3Dfilmikout.png')}}" class="img-thumbnail img-responsive">	
+</center>
+<br/>
+<br/>
+<p class="text-justify">The video can be visualized and downloaded (<button class="btn btn-primary btn-xs"><i class="fa fa-download"></i> Download video <span class="caret"></span></button> button) in <span class='capital'>ogv</span>, <span class='capital'>mp<span class="small">4</span></span> and <span class='capital'>webm</span> format. The correspondent <span class='capital'>pdb</span> file can be downloaded (<button class="btn btn-primary btn-xs"><i class="fa fa-flask"></i> Download PDB file</button> button) displaying <strong>Aggrescan3D scores</strong> in the temperature factor column. Additionaly, the prediction can be visualized and inspected using <span class=capital>jsmol</span> (<button class="btn btn-success btn-xs"><i class="fa fa-flask"></i> View in JSmol</button> button), as on figure below:</p>
+<br/>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D10out.png')}}" class="img-thumbnail img-responsive">
+</center>
+<br/>
+<br/>
+<hr>
+
+<h4><span class="label label-primary"><i class="fa fa-flask"></i> Dynamic mode details</span></h4>
+<p class="text-justify">If you have selected the <strong>Dynamic mode</strong> during job submission, under the <strong>Dynamic mode details</strong> tab is provided a brief explanation of the calculation method, a structural alignment of the input structure and the most aggregation-prone model and a graphic displaying a <span class='capital'>rmsd</span> profile (distances between residues of the two superimposed structures). Note that, the models are displayed in a random orientation. However, the most aggregation-prone model can be downloaded as a <span class='capital'>pdb</span> file and visualized with a molecular visualization software of your choice. This model is used as the unique input structure to perform <strong>A3D</strong> predictions.</p>
+<br/>
+<center>
+<img src="{{url_for('static', filename='img/Aggrescan3D11out.png')}}" class="img-thumbnail img-responsive">
+</center>
+<br/>
+<br/>
+
+      </div>
+    </div>
+  </div>
+
+

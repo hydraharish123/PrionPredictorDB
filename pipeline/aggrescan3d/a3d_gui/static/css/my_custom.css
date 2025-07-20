@@ -1,0 +1,354 @@
+.capital { text-rendering: auto; font-variant: small-caps; }
+.dot {
+      fill:#5cb85c;
+}
+.dot2 { 
+    fill: #d9534f;// red;
+}
+.cs {
+    margin-left: 20px;
+}
+.tooltip-inner {
+    max-width: 150px;
+    /* If max-width does not work, try using width instead */
+    width: 150px; 
+}
+.tab-pane {
+
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0px 0px 5px 5px;
+    padding-top: 10px;
+    padding-right: 5px;
+    padding-left: 0px;
+    padding-bottom: 3px;
+}
+
+
+table.snapshot-panel-1 {
+    position: absolute;
+    text-align: right;
+    margin-right: 11%;
+    border-collapse: separate;
+    border-spacing: 0 1em;
+}
+
+table.input-panel-1 {
+    position: absolute;
+    text-align: center;
+    border-collapse: separate;
+    border-spacing: 0 1em;
+}
+
+/*Didnt need to use that in the end*/
+table.snapshot-panel-2 {
+    position: absolute;
+    text-align: right;
+}
+table.snapshot-panel-2 tr td:first-child {
+  width: 100px;
+}
+table.snapshot-panel-2 tr td:nth-child(2) {
+  width: 100px;
+}
+table.snapshot-panel-2 tr td:last-child {
+  width: 100px;
+}
+
+
+
+.agg_log {
+    min-height: 100px;
+}
+
+.nav-tabs {
+    margin-bottom: 0;
+}
+.siatka {
+background:
+linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px,
+linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0px,
+linear-gradient(27deg, #222 5px, transparent 5px) 0px 10px,
+linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px,
+linear-gradient(90deg, #1b1b1b 10px, transparent 10px),
+linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
+background-color: #131313;
+background-size: 20px 20px;
+color:white;
+}
+
+.behind {
+        position: relative;
+            z-index: 10;
+        }
+
+.sequence {
+    white-space: pre-wrap;
+    word-break:break-all;
+        width: auto;
+        display:block;
+        font-family: "Lucida Console", Monaco, monospace;
+    }
+
+
+.sequence2 {
+    white-space: pre-wrap;
+    word-break:break-all;
+    font-family: courier;
+    }
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+mark {
+    background: #fcf8e3;// #8a6d3b;// #fff8e1;
+}
+div.bordered {
+    border-radius: 11px;
+    border: 1px solid black;
+}
+div.black {
+    background:#222;
+    padding:8px;
+    margin-top:50px;
+    display: inline-block;
+    border-radius: 6px; 
+}
+div.botinfo {
+    width:220px;
+    text-align:left;
+    position:absolute;
+    bottom:0;
+    margin-left:10px;
+    margin-bottom:10px;
+}
+
+
+.current_model {
+    background-color: #bee5eb;
+}
+
+.not_current {
+    background-color: #ffffff;
+}
+
+
+/*
+body {
+background: url(/static/img/bg.jpg) no-repeat center center fixed; 
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+*/
+.block {
+        background-color:rgba(0,0,0,0.2);
+                padding-left:12px;
+                    padding-right:12px;
+                }
+div.desc{
+	position:absolute; /* absolute position (so we can position it where we want)*/
+	bottom:0px; /* position will be on bottom */
+	left:15px;
+        padding: 2px;
+        text-align:center;
+        font-size:smaller;
+	width:89.0%;
+	background-color:black;
+	color:white;
+	opacity:0.8; /* transparency */
+        margin: 0px;
+	filter:alpha(opacity=60); /* IE transparency */
+}
+
+
+label >img {
+    opacity: 1;
+}
+
+.img-preview {
+  background-color: #f7f7f7;
+  overflow: hidden;
+  text-align: center;
+}
+.img-container {
+  box-shadow: inset 0 0 5px #eee;
+  height: 560px;
+}
+
+.img-container > img {
+  max-width: 100%;
+  max-height: inherit;
+}
+
+.img-preview {
+  margin-bottom: 10px;
+}
+nav.navbar {
+    background: #573d7e ;
+}
+
+/* First level of nav */
+.sidenav {
+  background-color: #f7f5fa;
+  width:250px;
+  border-radius: 5px;
+}
+
+/* All levels of nav */
+.sidebar .nav > li > a {
+  display: block;
+  color: #716b7a;
+  padding: 1px 20px;
+}
+.hdr  {
+  display: block;
+  color: #716b7a;
+  padding: 1px 8px;
+}
+.sidebar .nav > li > a:hover,
+.sidebar .nav > li > a:focus {
+  text-decoration: none;
+
+  background-color: #e5e3e9;
+}
+.sidebar .nav > .active > a,
+.sidebar .nav > .active:hover > a,
+.sidebar .nav > .active:focus > a {
+  font-weight: bold;
+  color: 563d7c;
+  background-color: transparent;
+}
+
+/* Nav: second level */
+.sidebar .nav .nav {
+	display: none;
+}
+.sidebar .nav > li.active .nav {
+	display:block;
+}
+.sidebar .nav .nav {
+  margin-bottom: 8px;
+}
+.sidebar .nav .nav > li > a {
+  padding-top:    3px;
+  padding-bottom: 3px;
+  font-size: 90%;
+}
+
+.tabtxt {
+    text-align: justify;
+}
+
+.btn-see-mutant {
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+}
+.btn-download-mutant {
+    font-size: 11px;
+    cursor: pointer;
+    padding: 5px;
+    background-color: #0446B0;
+    border-color: #0446B0;
+}
+
+.btn-drop {
+    background-color: #db8214;
+    color: white;
+    padding: 6px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    display: table-cell;
+    width: 100%;
+}
+
+.row-break {
+    height: 5px;
+}
+.btn-viewer {
+    padding: 6px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    display: table-cell;
+    width: 100%;
+}
+
+.btn-drop:hover, .btn-drop:focus {
+    background-color: #b96500;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}
+
+/* Font colours for auto-mutations tab */
+
+.good-mutation {
+ font-weight: bold;
+ font: arial, sans-serif;
+ color: #0a9100;
+}
+
+.medium-mutation{
+ font: arial, sans-serif;
+ color:#0a9100;
+}
+
+.neutral-mutation {
+ font: arial, sans-serif;
+ color: #808080;
+}
+
+.bad-mutation {
+ /*font-weight: bold;*/
+ font: arial, sans-serif;
+ color: #FFA500;
+}
+
+.terrible-mutation {
+ font: arial, sans-serif;
+  font-weight: bold;
+ color: #FF0000;
+}
