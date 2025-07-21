@@ -4,7 +4,6 @@ import sys
 import argparse
 from pyfiglet import figlet_format
 
-# Update these paths to match your system
 PY3 = r"C:\Users\Nkris\Programming\my-env\Scripts\python.exe"
 PY2 = r"C:\Users\Nkris\Programming\py27env\Scripts\python.exe"
 
@@ -22,6 +21,8 @@ def run_step(python_path, script, args):
             print(f"[❌] Could not run PLAAC '{args[0]}' {result.stderr}.")
         if script == 'run_a3d.py' and result.returncode == 5:
             print(f"[❌] Could not run Aggrescan3D '{args[0]}'. Either the input was not correct or aggrescan failed to compute or server failed")
+        if script == 'run_clustering.py' and result.returncode == 6:
+            print(f"[❌] Could not perform clustering as there were 0 residues with aggregation score > 0")
         
         else:
             print(f"[ERROR] Step failed: {script}")
@@ -82,6 +83,17 @@ def main():
     print("[✔] Aggrescan Analysis complete")
     print(f"[📁] Step 5 result saved to {os.path.join(output_dir, f"a3d_{uid}/")}")
 
+    print("\n")
+
+    print("[*] Running step 6: Perfoming clustering...")
+    run_step(PY3, 'run_clustering.py', [uid, output_dir])
+    print(f"[📁] Step 6 result saved")
+
+    print("\n")
+
+    print("[*] Running step 7: Creating pymol script...")
+    run_step(PY3, 'run_pymol.py', [uid, output_dir])
+    print("[✔] Pipeline completed")
 
 
     
