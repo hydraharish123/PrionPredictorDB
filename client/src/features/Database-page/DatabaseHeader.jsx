@@ -4,13 +4,13 @@ function DatabaseHeader({ search, setSearch }) {
             <h1 className="text-2xl font-bold tracking-wide">
                 PrionPredictorDB
             </h1>
-            <input
+            {/* <input
                 type="text"
                 placeholder="Search proteins by ID or name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full border px-4 py-2 text-sm text-black shadow md:max-w-96"
-            />
+            /> */}
             <div className="flex items-center gap-4 text-sm">
                 <h2 className="cursor-pointer font-semibold">Documentation</h2>
                 <h2 className="cursor-pointer font-semibold">Contact</h2>

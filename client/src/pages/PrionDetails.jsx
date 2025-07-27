@@ -57,6 +57,7 @@ function PrionDetails() {
 
                 {fileData?.pdb && (
                     <NglViewer
+                        csv_url={fileData.a3d_csv}
                         pdbUrl={fileData.pdb}
                         centroidsUrl={fileData.centroids}
                         clusteringUrl={fileData.clustering}

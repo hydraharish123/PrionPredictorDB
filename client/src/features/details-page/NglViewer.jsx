@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { loadNGL } from '../../utils/loadNGL'
+import Papa from 'papaparse'
 
 function generateClusterColors(n) {
     const colors = []
@@ -11,10 +12,29 @@ function generateClusterColors(n) {
     return colors
 }
 
-export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl }) {
+export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl, csv_url }) {
     const viewerRef = useRef()
     const [clusteringData, setClusteringData] = useState({})
     const [clusterColors, setClusterColors] = useState([])
+    const [csvData, setCSVdata] = useState([])
+    const [mapped, setMapped] = useState([])
+        useEffect(() => {
+            fetch(`http://localhost:3000${csv_url}`)
+                .then((response) => response.text())
+                .then((csvText) => {
+                    const parsed = Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        dynamicTyping: true,
+                    })
+                    console.log(parsed)
+                    // setCSVdata(parsed.data)
+                    const res = parsed.data.map(obj => obj.residue_name)
+                    setMapped(res)
+                    // console.log(res)
+                })
+                .catch((error) => console.error('CSV load error:', error))
+        }, [csv_url])
 
     useEffect(() => {
         if (!clusteringUrl) return
@@ -132,6 +152,7 @@ export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl }) {
                                     key={clusterId}
                                     className="flex items-start gap-2"
                                 >
+                                    
                                     <span
                                         className="mt-1 inline-block h-3 w-3 rounded-full"
                                         style={{
@@ -148,7 +169,7 @@ export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl }) {
                                             {residues
                                                 .map(
                                                     (r) =>
-                                                        `${r.chain}${r.residue}`
+                                                        `${mapped[r.residue - 1]}${r.residue}`
                                                 )
                                                 .join(', ')}
                                         </span>

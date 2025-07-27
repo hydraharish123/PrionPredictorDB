@@ -9,11 +9,11 @@ function AggreScan3dChart({ csv_url }) {
             .then((response) => response.text())
             .then((csvText) => {
                 const parsed = Papa.parse(csvText, {
-                    header: true, // use first row as keys
+                    header: true,
                     skipEmptyLines: true,
                     dynamicTyping: true,
                 })
-                
+                console.log(parsed)
                 setCSVdata(parsed.data)
             })
             .catch((error) => console.error('CSV load error:', error))
