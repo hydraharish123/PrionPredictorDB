@@ -126,7 +126,7 @@ function Homepage() {
                             from 3D coordinates. Clustering was performed using{' '}
                             <em>DBSCAN</em> to identify spatially cohesive
                             substructures. All clusters were visualized using
-                            PyMOL and NGX Viewer.
+                            PyMOL and NGL Viewer.
                         </li>
                     </ul>
                 </div>
