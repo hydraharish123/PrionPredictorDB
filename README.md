@@ -25,6 +25,8 @@
 
 ## Workflow Overview
 
+![Workflow](assets/workflow.png)
+
 ### 1. **PRD Detection (PLAAC)**
 - Input: Human proteome FASTA (UniProt)
 - Output: 195 proteins with valid prion-like domains (PRDs)
