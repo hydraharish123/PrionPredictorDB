@@ -5,7 +5,7 @@
 ![Issues](https://img.shields.io/github/issues/hydraharish123/PrionPredictorDB)
 ![License](https://img.shields.io/github/license/hydraharish123/PrionPredictorDB)
 
-**PrionPredictorDB** is a scalable and organism-independent pipeline and database for the prediction of prion-like, aggregation-prone proteins using both **sequence** and **structure-based** methods. This project integrates tools like **PLAAC**, **AlphaFold**, **Aggrescan3D**, and **DBSCAN** to identify and cluster potentially pathogenic prion-like domains (PRDs) across any organism's proteome.
+**PrionPredictorDB** is a scalable and organism-independent pipeline and database for the prediction of prion-like, aggregation-prone proteins using both **sequence** and **structure-based** methods. This project integrates tools like **PLAAC**, **AlphaFold**, **Aggrescan3D**, and **DBSCAN** to identify and cluster potentially pathogenic prion-like domains (PRDs) across the human proteome.
 
 ---
 
@@ -19,7 +19,7 @@
   - **Aggrescan3D** to score individual residues
   - **DBSCAN** to cluster aggregation-prone residues in 3D
 - Developed a **command-line tool** to run the entire pipeline on any FASTA proteome.
-- 🖥Built a full-stack **web application** with a ReactJS frontend, NGLViewer for structure rendering, and MongoDB backend.
+- Built a full-stack **web application** with a ReactJS frontend, NGLViewer for structure rendering, and MongoDB backend.
 
 ---
 
@@ -36,12 +36,9 @@
   - **Average pLDDT < 50**
 - Result: 188 proteins passed structure availability and thresholding
 
-Absolutely — here's an updated version of the **DBSCAN-related section** in the README, now including the **biological rationale** for why 3D clustering of aggregation-prone residues matters:
-
-
 ### 3. Aggregation Propensity and 3D Clustering
 
-To identify realistic aggregation hotspots within prion-like domains (PRDs), we implemented a **structure-aware aggregation pipeline**:
+I used aggrescan3d to identify realistic aggregation hotspots within prion-like domains (PRDs),
 
 #### Steps:
 
@@ -89,10 +86,6 @@ Aggregation is a **structural phenomenon**, not just a sequence-level one. Simpl
   "SASA": 622.85,
   "Average_pLDDT": 31.81,
   "Aggregating-like": "No",
-  "Aggrescan3D Clusters": [
-    {"residues": [860, 861, 862], "cluster_id": 1, "score_avg": 0.67},
-    ...
-  ]
 }
 ````
 
