@@ -89,6 +89,9 @@ Aggregation is a **structural phenomenon**, not just a sequence-level one. Simpl
 }
 ````
 
+![Analysis of O15162](assets/Screenshot%202025-07-31%20045227.png)
+
+
 ---
 
 ## Tech Stack
