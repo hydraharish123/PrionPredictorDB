@@ -12,29 +12,35 @@ function generateClusterColors(n) {
     return colors
 }
 
-export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl, csv_url }) {
+export function NglViewer({
+    pdbUrl,
+    centroidsUrl,
+    clusteringUrl,
+    csv_url,
+    data,
+}) {
     const viewerRef = useRef()
     const [clusteringData, setClusteringData] = useState({})
     const [clusterColors, setClusterColors] = useState([])
     const [csvData, setCSVdata] = useState([])
     const [mapped, setMapped] = useState([])
-        useEffect(() => {
-            fetch(`http://localhost:3000${csv_url}`)
-                .then((response) => response.text())
-                .then((csvText) => {
-                    const parsed = Papa.parse(csvText, {
-                        header: true,
-                        skipEmptyLines: true,
-                        dynamicTyping: true,
-                    })
-                    console.log(parsed)
-                    // setCSVdata(parsed.data)
-                    const res = parsed.data.map(obj => obj.residue_name)
-                    setMapped(res)
-                    // console.log(res)
+    useEffect(() => {
+        fetch(`http://localhost:3000${csv_url}`)
+            .then((response) => response.text())
+            .then((csvText) => {
+                const parsed = Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: true,
                 })
-                .catch((error) => console.error('CSV load error:', error))
-        }, [csv_url])
+                console.log(parsed)
+                // setCSVdata(parsed.data)
+                const res = parsed.data.map((obj) => obj.residue_name)
+                setMapped(res)
+                // console.log(res)
+            })
+            .catch((error) => console.error('CSV load error:', error))
+    }, [csv_url])
 
     useEffect(() => {
         if (!clusteringUrl) return
@@ -67,6 +73,12 @@ export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl, csv_url }) {
                     o.addRepresentation('line', {
                         sele: 'backbone',
                         color: 'green',
+                    })
+
+                    o.addRepresentation('ball+stick', {
+                        sele: `${data.PRDstart}-${data.PRDend}`,
+                        color: 'red',
+                        name: 'custom_range',
                     })
 
                     Object.entries(clusteringData).forEach(
@@ -144,7 +156,9 @@ export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl, csv_url }) {
 
             {Object.keys(clusteringData).length > 0 && (
                 <div className="mt-4 rounded-md bg-blue-50 p-6 text-sm text-[#1e3c72] shadow-sm">
-                    <h2 className="mb-4 font-semibold text-xl">Cluster Legend</h2>
+                    <h2 className="mb-4 text-xl font-semibold">
+                        Cluster Legend
+                    </h2>
                     <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
                         {Object.entries(clusteringData).map(
                             ([clusterId, residues], i) => (
@@ -152,7 +166,6 @@ export function NglViewer({ pdbUrl, centroidsUrl, clusteringUrl, csv_url }) {
                                     key={clusterId}
                                     className="flex items-start gap-2"
                                 >
-                                    
                                     <span
                                         className="mt-1 inline-block h-3 w-3 rounded-full"
                                         style={{

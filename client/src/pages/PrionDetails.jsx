@@ -57,6 +57,7 @@ function PrionDetails() {
 
                 {fileData?.pdb && (
                     <NglViewer
+                        data={proteinData}
                         csv_url={fileData.a3d_csv}
                         pdbUrl={fileData.pdb}
                         centroidsUrl={fileData.centroids}
