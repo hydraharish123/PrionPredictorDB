@@ -91,7 +91,7 @@ Aggregation is a **structural phenomenon**, not just a sequence-level one. Simpl
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 | Component       | Technology                 |
 | --------------- | -------------------------- |
@@ -100,7 +100,7 @@ Aggregation is a **structural phenomenon**, not just a sequence-level one. Simpl
 | **Frontend**    | ReactJS, NGLViewer, Plotly |
 | **CLI Tool**    | Python                     |
 | **Aggregation** | Aggrescan3D, DBSCAN        |
-| **Structure**   | AlphaFold + Biopython      |
+| **Structure Information**   | AlphaFold + Biopython      |
 | **PRD Finder**  | PLAAC                      |
 
 ---
@@ -124,8 +124,8 @@ python cli.py <sample_fasta> <reference_fasta> -o <output_dir>
 
 **Arguments:**
 
-* `sample_fasta`: Proteome FASTA file (multi-sequence)
-* `reference_fasta`: Same as sample or a genome reference (for codon bias, if needed)
+* `sample_fasta`: FASTA file 
+* `reference_fasta`: genome reference 
 * `-o, --output`: Output directory to store:
 
   * Filtered PRD list
@@ -135,7 +135,7 @@ python cli.py <sample_fasta> <reference_fasta> -o <output_dir>
 
 ---
 
-## Web Dashboard
+## User Interface Dashboard
 
 ### Features:
 
@@ -162,11 +162,11 @@ python cli.py <sample_fasta> <reference_fasta> -o <output_dir>
 
 ```
 PrionPredictorDB/
-├── server/              # Node.js API
+├── server/             # Node.js API
 ├── client/             # React frontend
-├── scripts/             # Python scripts (PLAAC, A3D, DBSCAN, AlphaFold parsers)
-├── data/               
-├── pipeline/                # Command line interface
+├── scripts/            # Python scripts (PLAAC, A3D, DBSCAN, AlphaFold parsers)
+├── data/               # Raw and processed data
+├── pipeline/           # Command line interface
 └── README.md
 ```
 
