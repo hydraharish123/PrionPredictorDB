@@ -9,19 +9,6 @@
 
 ---
 
-## Highlights
-
-- Analyzed the complete **human proteome (~20,000 proteins)** using PLAAC to identify **195 PRD-containing proteins**.
-- Retrieved **AlphaFold structures** for 188 proteins and computed:
-  - **Solvent Accessible Surface Area (SASA)**
-  - **Average pLDDT** scores
-- Identified aggregation-prone PRDs using:
-  - **Aggrescan3D** to score individual residues
-  - **DBSCAN** to cluster aggregation-prone residues in 3D
-- Developed a **command-line tool** to run the entire pipeline on any FASTA proteome.
-- Built a full-stack **web application** with a ReactJS frontend, NGLViewer for structure rendering, and MongoDB backend.
-
----
 
 ## Workflow Overview
 
@@ -159,7 +146,6 @@ python cli.py <sample_fasta> <reference_fasta> -o <output_dir>
 
 * **Prion-like domains (PLDs)** are disordered regions enriched in Q/N residues and implicated in **neurodegenerative diseases** like ALS and Alzheimer’s.
 * Aggregation-prone PLDs are often overlooked due to structural disorder. Combining **PLAAC**, **structure-based filtering**, and **residue clustering** helps refine high-confidence candidates.
-* Your dataset and framework can aid in **target discovery** for drug design or genetic studies.
 
 ---
 
