@@ -5,6 +5,9 @@
 ![Issues](https://img.shields.io/github/issues/hydraharish123/PrionPredictorDB)
 ![License](https://img.shields.io/github/license/hydraharish123/PrionPredictorDB)
 
+![Homepage](assets/PPDB_Homepage.png)
+
+
 **PrionPredictorDB** is a scalable and organism-independent pipeline and database for the prediction of prion-like, aggregation-prone proteins using both **sequence** and **structure-based** methods. This project integrates tools like **PLAAC**, **AlphaFold**, **Aggrescan3D**, and **DBSCAN** to identify and cluster potentially pathogenic prion-like domains (PRDs) across the human proteome.
 
 ---
@@ -78,8 +81,10 @@ Aggregation is a **structural phenomenon**, not just a sequence-level one. Simpl
 }
 ````
 
-![Analysis of O15162](assets/Screenshot%202025-07-31%20045227.png)
+![O15162 metadata](assets/Example.png)
 
+![Analysis of O15162](assets/Screenshot%202025-07-31%20045227.png)
+![O15162 PRD](assets/PRD_Example.png)
 
 ---
 
@@ -135,10 +140,6 @@ python cli.py <sample_fasta> <reference_fasta> -o <output_dir>
 * View AlphaFold structures in 3D using **NGLViewer**
 * Interactive aggregation cluster plots with **Plotly.js**
 * Export sequences and visualizations
-
-### Screenshots
-
-
 
 ---
 
