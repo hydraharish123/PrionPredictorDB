@@ -18,6 +18,7 @@
 ![Workflow](assets/workflow.png)
 
 ### 1. **PRD Detection (PLAAC)**
+- **Tool:** [PLAAC](http://plaac.wi.mit.edu/) A Command Line and web-based tool to accurately detect proline-rich domains based on input FASTA sequence and refernece genome 
 - Input: Human proteome FASTA (UniProt)
 - Output: 195 proteins with valid prion-like domains (PRDs)
 
